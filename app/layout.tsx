@@ -7,8 +7,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
+  title: 'FoundHer - Empowering Young Women Globally',
+  description: 'Discover opportunities, find collaborators, and access funding. A global platform for young women to connect and grow.',
   generator: 'v0.app',
   icons: {
     icon: [

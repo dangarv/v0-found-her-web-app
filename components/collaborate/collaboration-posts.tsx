@@ -1,0 +1,133 @@
+import { CollaborationPostCard } from "./collaboration-post-card"
+
+// Mock data
+const mockPosts = [
+  {
+    id: "1",
+    user_id: "user1",
+    title: "Looking for co-founder for EdTech startup",
+    description: "Building an AI-powered platform to help students learn coding. Need someone with business development experience and passion for education.",
+    looking_for: ["Business Development", "Marketing", "Product Management"],
+    project_type: "Startup",
+    is_active: true,
+    created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date().toISOString(),
+    profile: {
+      id: "user1",
+      email: "sarah@example.com",
+      full_name: "Sarah Kim",
+      avatar_url: null,
+      bio: "Software engineer passionate about education",
+      location: "San Francisco, CA",
+      skills: ["React", "Node.js", "AI/ML"],
+      interests: ["EdTech", "AI"],
+      linkedin_url: null,
+      website_url: null,
+      is_looking_for_collaborators: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    likes_count: 24,
+    comments_count: 8,
+    is_liked: false,
+  },
+  {
+    id: "2",
+    user_id: "user2",
+    title: "Need designer for hackathon project this weekend",
+    description: "Participating in a climate tech hackathon and looking for a UI/UX designer to help create an impactful solution for carbon footprint tracking.",
+    looking_for: ["UI/UX Design", "Figma", "Mobile Design"],
+    project_type: "Hackathon",
+    is_active: true,
+    created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date().toISOString(),
+    profile: {
+      id: "user2",
+      email: "maria@example.com",
+      full_name: "Maria Lopez",
+      avatar_url: null,
+      bio: "Full-stack developer and climate activist",
+      location: "Austin, TX",
+      skills: ["Python", "Django", "PostgreSQL"],
+      interests: ["Climate Tech", "Sustainability"],
+      linkedin_url: null,
+      website_url: null,
+      is_looking_for_collaborators: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    likes_count: 15,
+    comments_count: 5,
+    is_liked: true,
+  },
+  {
+    id: "3",
+    user_id: "user3",
+    title: "Research partner wanted for ML fairness project",
+    description: "Working on a research paper about bias in machine learning models. Looking for someone with strong statistics background and interest in AI ethics.",
+    looking_for: ["Machine Learning", "Statistics", "Research"],
+    project_type: "Research",
+    is_active: true,
+    created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date().toISOString(),
+    profile: {
+      id: "user3",
+      email: "aisha@example.com",
+      full_name: "Aisha Mbeki",
+      avatar_url: null,
+      bio: "PhD student in Computer Science",
+      location: "Boston, MA",
+      skills: ["Python", "TensorFlow", "PyTorch"],
+      interests: ["AI Ethics", "Fairness in ML"],
+      linkedin_url: null,
+      website_url: null,
+      is_looking_for_collaborators: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    likes_count: 32,
+    comments_count: 12,
+    is_liked: false,
+  },
+  {
+    id: "4",
+    user_id: "user4",
+    title: "Building a community for women in blockchain",
+    description: "Creating a Discord community and educational content for women interested in blockchain and Web3. Looking for content creators and community managers.",
+    looking_for: ["Content Creation", "Community Management", "Blockchain"],
+    project_type: "Community",
+    is_active: true,
+    created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date().toISOString(),
+    profile: {
+      id: "user4",
+      email: "jessica@example.com",
+      full_name: "Jessica Chen",
+      avatar_url: null,
+      bio: "Blockchain developer and educator",
+      location: "New York, NY",
+      skills: ["Solidity", "Web3.js", "Technical Writing"],
+      interests: ["Blockchain", "Web3", "Education"],
+      linkedin_url: null,
+      website_url: null,
+      is_looking_for_collaborators: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    likes_count: 45,
+    comments_count: 18,
+    is_liked: false,
+  },
+]
+
+export async function CollaborationPosts() {
+  const posts = mockPosts
+
+  return (
+    <div className="grid gap-4 md:grid-cols-2">
+      {posts.map((post) => (
+        <CollaborationPostCard key={post.id} post={post} />
+      ))}
+    </div>
+  )
+}
