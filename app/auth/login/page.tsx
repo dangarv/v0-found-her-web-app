@@ -99,16 +99,16 @@ export default function Page() {
           </div>
           <Card className="border-border/50 rounded-2xl backdrop-blur-sm bg-card/80">
             <CardHeader className="text-center">
-              <CardTitle className="text-2xl">{t('login')}</CardTitle>
+              <CardTitle className="text-2xl">{t('welcomeBack')}</CardTitle>
               <CardDescription>
-                {language === 'en' ? 'Sign in to continue your journey' : 'Inicia sesión para continuar tu viaje'}
+                {t('signInToContinue')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleLogin}>
                 <div className="flex flex-col gap-6">
                   <div className="grid gap-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">{t('email')}</Label>
                     <Input
                       id="email"
                       type="email"
@@ -120,7 +120,7 @@ export default function Page() {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="password">{language === 'en' ? 'Password' : 'Contraseña'}</Label>
+                    <Label htmlFor="password">{t('password')}</Label>
                     <Input
                       id="password"
                       type="password"
@@ -133,18 +133,18 @@ export default function Page() {
                   {error && <p className="text-sm text-destructive">{error}</p>}
                   <Button type="submit" className="w-full rounded-xl" size="lg" disabled={isLoading}>
                     {isLoading 
-                      ? (language === 'en' ? 'Logging in...' : 'Iniciando sesión...') 
-                      : t('login')
+                      ? t('loading')
+                      : t('signIn')
                     }
                   </Button>
                 </div>
                 <div className="mt-4 text-center text-sm">
-                  {language === 'en' ? "Don't have an account?" : '¿No tienes una cuenta?'}{' '}
+                  {t('dontHaveAccount')}{' '}
                   <Link
                     href="/auth/sign-up"
                     className="underline underline-offset-4 text-primary hover:text-primary/80"
                   >
-                    {t('signUp')}
+                    {t('createAccount')}
                   </Link>
                 </div>
               </form>

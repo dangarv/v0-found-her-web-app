@@ -183,7 +183,7 @@ export default function ProfilePage() {
   }
 
   const displayName = profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'
-  const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+  const initials = displayName?.split(' ')?.map(n => n?.[0])?.join('')?.toUpperCase()?.slice(0, 2) || 'U'
 
   return (
     <div className="space-y-6 max-w-4xl">

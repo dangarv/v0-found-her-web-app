@@ -142,14 +142,14 @@ export default function Page() {
           </div>
           <Card className="border-border/50 rounded-2xl backdrop-blur-sm bg-card/80">
             <CardHeader className="text-center">
-              <CardTitle className="text-2xl">{language === 'en' ? 'Join FoundHer' : 'Únete a FoundHer'}</CardTitle>
-              <CardDescription>{language === 'en' ? 'Start your journey today' : 'Comienza tu viaje hoy'}</CardDescription>
+              <CardTitle className="text-2xl">{t('joinCommunity')}</CardTitle>
+              <CardDescription>{t('startExploring')}</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSignUp}>
                 <div className="flex flex-col gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="fullName">{language === 'en' ? 'Full Name' : 'Nombre Completo'}</Label>
+                    <Label htmlFor="fullName">{t('fullName')}</Label>
                     <Input
                       id="fullName"
                       type="text"
@@ -161,7 +161,7 @@ export default function Page() {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">{t('email')}</Label>
                     <Input
                       id="email"
                       type="email"
@@ -173,7 +173,7 @@ export default function Page() {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="password">{language === 'en' ? 'Password' : 'Contraseña'}</Label>
+                    <Label htmlFor="password">{t('password')}</Label>
                     <Input
                       id="password"
                       type="password"
@@ -184,7 +184,7 @@ export default function Page() {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="repeat-password">{language === 'en' ? 'Confirm Password' : 'Confirmar Contraseña'}</Label>
+                    <Label htmlFor="repeat-password">{t('confirmPassword')}</Label>
                     <Input
                       id="repeat-password"
                       type="password"
@@ -197,18 +197,18 @@ export default function Page() {
                   {error && <p className="text-sm text-destructive">{error}</p>}
                   <Button type="submit" className="w-full rounded-xl" size="lg" disabled={isLoading}>
                     {isLoading 
-                      ? (language === 'en' ? 'Creating account...' : 'Creando cuenta...') 
-                      : t('signUp')
+                      ? t('loading')
+                      : t('createAccount')
                     }
                   </Button>
                 </div>
                 <div className="mt-4 text-center text-sm">
-                  {language === 'en' ? 'Already have an account?' : '¿Ya tienes una cuenta?'}{' '}
+                  {t('alreadyHaveAccount')}{' '}
                   <Link
                     href="/auth/login"
                     className="underline underline-offset-4 text-primary hover:text-primary/80"
                   >
-                    {t('login')}
+                    {t('signIn')}
                   </Link>
                 </div>
               </form>

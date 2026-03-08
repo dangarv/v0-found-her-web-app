@@ -35,10 +35,10 @@ export function Header() {
               </Link>
 
               <nav className="hidden md:flex items-center gap-6">
-                <Link href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                   {t('features')}
                 </Link>
-                <Link href="#testimonials" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/#testimonials" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                   {t('stories')}
                 </Link>
                 <Link href="/opportunities" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
@@ -119,10 +119,10 @@ export function Header() {
           {mobileMenuOpen && (
             <div className="md:hidden border-t border-border/50">
               <div className="px-4 py-4 space-y-3">
-                <Link href="#features" className="block text-sm font-medium text-muted-foreground hover:text-foreground">
+                <Link href="/#features" className="block text-sm font-medium text-muted-foreground hover:text-foreground">
                   {t('features')}
                 </Link>
-                <Link href="#testimonials" className="block text-sm font-medium text-muted-foreground hover:text-foreground">
+                <Link href="/#testimonials" className="block text-sm font-medium text-muted-foreground hover:text-foreground">
                   {t('stories')}
                 </Link>
                 <Link href="/opportunities" className="block text-sm font-medium text-muted-foreground hover:text-foreground">
