@@ -36,6 +36,7 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
   const [isSaved, setIsSaved] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
   const [showAuthDialog, setShowAuthDialog] = useState(false)
+  const [formattedDeadline, setFormattedDeadline] = useState<string>("")
   const { t } = useLanguage()
 
   useEffect(() => {
@@ -47,21 +48,27 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
     checkAuth()
   }, [])
 
+  // Format date only on client to avoid hydration mismatch
+  useEffect(() => {
+    if (!opportunity.deadline) {
+      setFormattedDeadline(t('noDeadline'))
+      return
+    }
+    const date = new Date(opportunity.deadline)
+    if (isNaN(date.getTime())) {
+      setFormattedDeadline(opportunity.deadline)
+      return
+    }
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    setFormattedDeadline(`${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`)
+  }, [opportunity.deadline, t])
+
   const handleSave = () => {
     if (!isAuthenticated) {
       setShowAuthDialog(true)
       return
     }
     setIsSaved(!isSaved)
-  }
-
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return t('noDeadline')
-    // Handle various date formats - use UTC to avoid hydration mismatch
-    const date = new Date(dateString)
-    if (isNaN(date.getTime())) return dateString
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    return `${months[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}`
   }
 
   const isRemote = opportunity.modality?.toLowerCase().includes("remote") || 
@@ -124,10 +131,10 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
                 <span>{opportunity.scope}</span>
               </div>
             )}
-            {opportunity.deadline && (
+            {opportunity.deadline && formattedDeadline && (
               <div className="flex items-center gap-1 text-muted-foreground">
                 <Calendar className="h-4 w-4" />
-                <span>{formatDate(opportunity.deadline)}</span>
+                <span>{formattedDeadline}</span>
               </div>
             )}
             {opportunity.field && (
