@@ -1,8 +1,9 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Sparkles, Menu, X, Globe } from "lucide-react"
+import { Menu, X, Globe } from "lucide-react"
 import { useState } from "react"
 import { useLanguage } from "@/lib/language-context"
 import {
@@ -23,9 +24,13 @@ export function Header() {
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="flex h-14 items-center justify-between">
               <Link href="/" className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary">
-                  <Sparkles className="h-4 w-4 text-primary-foreground" />
-                </div>
+                <Image 
+                  src="/foundher-logo.png" 
+                  alt="FoundHer" 
+                  width={36} 
+                  height={36} 
+                  className="rounded-lg"
+                />
                 <span className="text-lg font-bold text-foreground">FoundHer</span>
               </Link>
 

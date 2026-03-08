@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { User } from "@supabase/supabase-js"
 import {
@@ -23,7 +24,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  Sparkles,
   LayoutDashboard,
   Search,
   Users,
@@ -105,9 +105,13 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/dashboard">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                  <Sparkles className="h-4 w-4 text-primary-foreground" />
-                </div>
+                <Image 
+                  src="/foundher-logo.png" 
+                  alt="FoundHer" 
+                  width={32} 
+                  height={32} 
+                  className="rounded-lg"
+                />
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-semibold">FoundHer</span>
                   <span className="text-xs text-muted-foreground">Dashboard</span>

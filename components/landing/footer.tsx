@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Sparkles } from "lucide-react"
+import Image from "next/image"
 import { useLanguage } from "@/lib/language-context"
 
 export function Footer() {
@@ -39,9 +39,13 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-primary">
-                <Sparkles className="h-5 w-5 text-primary-foreground" />
-              </div>
+              <Image 
+                src="/foundher-logo.png" 
+                alt="FoundHer" 
+                width={36} 
+                height={36} 
+                className="rounded-lg"
+              />
               <span className="text-xl font-bold text-foreground">FoundHer</span>
             </Link>
             <p className="mt-4 text-sm text-muted-foreground max-w-xs">

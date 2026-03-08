@@ -47,8 +47,8 @@ export default function CollaboratePage() {
                 {t('collaborateSubtitle')}
               </p>
             </div>
-            <Button onClick={handleCreatePost} className="rounded-xl gap-2">
-              <Plus className="h-4 w-4" />
+            <Button onClick={handleCreatePost} className="rounded-xl gap-2" size="lg">
+              <Plus className="h-5 w-5" />
               {t('createPost')}
             </Button>
           </div>

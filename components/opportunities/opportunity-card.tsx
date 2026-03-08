@@ -9,6 +9,7 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { AuthRequiredDialog } from "@/components/auth-required-dialog"
 import { useLanguage } from "@/lib/language-context"
+import Link from "next/link"
 
 interface OpportunityCardProps {
   opportunity: Opportunity
@@ -47,7 +48,7 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
   }
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return t.noDeadline
+    if (!dateString) return t('noDeadline')
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -75,7 +76,7 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
                   {opportunity.category}
                 </Badge>
                 {opportunity.is_remote && (
-                  <Badge variant="secondary" className="bg-secondary text-secondary-foreground">{t.remote}</Badge>
+                  <Badge variant="secondary" className="bg-secondary text-secondary-foreground">{t('remote')}</Badge>
                 )}
               </div>
               <h3 className="font-semibold text-lg text-foreground leading-tight">
@@ -103,7 +104,7 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
             {(opportunity.location || opportunity.is_remote) && (
               <div className="flex items-center gap-1 text-muted-foreground">
                 <MapPin className="h-4 w-4" />
-                <span>{opportunity.is_remote ? t.remote : opportunity.location}</span>
+                <span>{opportunity.is_remote ? t('remote') : opportunity.location}</span>
               </div>
             )}
             <div className="flex items-center gap-1 text-muted-foreground">
@@ -132,13 +133,17 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
           )}
 
           <div className="flex items-center gap-2 pt-2">
-            <Button asChild className="flex-1 rounded-xl">
+            <Button asChild className="flex-1 rounded-xl" size="lg">
+              <Link href={`/opportunities/${opportunity.id}`}>
+                {t('learnMore')}
+              </Link>
+            </Button>
+            <Button variant="outline" className="rounded-xl" size="lg" asChild>
               <a href={opportunity.url} target="_blank" rel="noopener noreferrer">
-                {t.apply}
+                {t('apply')}
                 <ExternalLink className="ml-2 h-4 w-4" />
               </a>
             </Button>
-            <Button variant="outline" className="rounded-xl">{t.learnMore}</Button>
           </div>
         </CardContent>
       </Card>
