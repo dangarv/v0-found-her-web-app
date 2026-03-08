@@ -19,54 +19,64 @@ import {
   Send,
   CheckCircle2,
   Circle,
-  Clock
+  Clock,
+  Loader2,
+  ArrowLeft
 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { AuthRequiredDialog } from "@/components/auth-required-dialog"
 import type { User } from "@supabase/supabase-js"
+import type { Group, Profile } from "@/lib/types"
 import { use } from "react"
+import Link from "next/link"
 
-// Mock group data
-const mockGroup = {
-  id: "1",
-  name: "Fulbright Application Squad",
-  description: "A motivation circle for women applying to Fulbright scholarships. We meet weekly to review essays, practice interviews, and keep each other accountable.",
-  type: "Motivation Circle",
-  memberCount: 12,
-  image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=200&fit=crop",
-  createdAt: "2024-01-15",
-  members: [
-    { id: "1", name: "Camila Rodriguez", location: "Buenos Aires, Argentina", role: "Admin" },
-    { id: "2", name: "Sofia Herrera", location: "Lima, Peru", role: "Member" },
-    { id: "3", name: "Valentina Silva", location: "Sao Paulo, Brazil", role: "Member" },
-    { id: "4", name: "Isabella Martinez", location: "Mexico City, Mexico", role: "Member" },
-    { id: "5", name: "Lucia Fernandez", location: "Santiago, Chile", role: "Member" },
-  ],
-  progressItems: [
-    { id: "1", title: "Complete personal statement draft", completed: true, dueDate: "2024-02-01" },
-    { id: "2", title: "Get 2 recommendation letters", completed: true, dueDate: "2024-02-15" },
-    { id: "3", title: "Research host institutions", completed: false, dueDate: "2024-02-28" },
-    { id: "4", title: "Submit application", completed: false, dueDate: "2024-03-15" },
-  ],
-  messages: [
-    { id: "1", userId: "1", userName: "Camila", text: "Just finished my first draft! Anyone want to swap for feedback?", time: "10:30 AM" },
-    { id: "2", userId: "2", userName: "Sofia", text: "I would love to! I can review yours this weekend.", time: "10:45 AM" },
-    { id: "3", userId: "3", userName: "Valentina", text: "Reminder: Our weekly check-in is tomorrow at 6pm!", time: "11:00 AM" },
-  ],
-  activityFeed: [
-    { id: "1", user: "Camila Rodriguez", action: "completed", item: "Personal statement draft", time: "2 hours ago" },
-    { id: "2", user: "Sofia Herrera", action: "joined", item: "the group", time: "1 day ago" },
-    { id: "3", user: "Valentina Silva", action: "added", item: "new milestone: Research host institutions", time: "2 days ago" },
-  ],
+// Fallback data structure
+const fallbackProgressItems = [
+  { id: "1", title: "Complete personal statement draft", completed: true, dueDate: "2024-02-01" },
+  { id: "2", title: "Get 2 recommendation letters", completed: true, dueDate: "2024-02-15" },
+  { id: "3", title: "Research host institutions", completed: false, dueDate: "2024-02-28" },
+  { id: "4", title: "Submit application", completed: false, dueDate: "2024-03-15" },
+]
+
+const fallbackMessages = [
+  { id: "1", userId: "1", userName: "Camila", text: "Just finished my first draft! Anyone want to swap for feedback?", time: "10:30 AM" },
+  { id: "2", userId: "2", userName: "Sofia", text: "I would love to! I can review yours this weekend.", time: "10:45 AM" },
+  { id: "3", userId: "3", userName: "Valentina", text: "Reminder: Our weekly check-in is tomorrow at 6pm!", time: "11:00 AM" },
+]
+
+const fallbackActivity = [
+  { id: "1", user: "Camila Rodriguez", action: "completed", item: "Personal statement draft", time: "2 hours ago" },
+  { id: "2", user: "Sofia Herrera", action: "joined", item: "the group", time: "1 day ago" },
+  { id: "3", user: "Valentina Silva", action: "added", item: "new milestone: Research host institutions", time: "2 days ago" },
+]
+
+const fallbackMembers = [
+  { id: "1", full_name: "Camila Rodriguez", location: "Buenos Aires, Argentina", role: "Admin" },
+  { id: "2", full_name: "Sofia Herrera", location: "Lima, Peru", role: "Member" },
+  { id: "3", full_name: "Valentina Silva", location: "Sao Paulo, Brazil", role: "Member" },
+  { id: "4", full_name: "Isabella Martinez", location: "Mexico City, Mexico", role: "Member" },
+  { id: "5", full_name: "Lucia Fernandez", location: "Santiago, Chile", role: "Member" },
+]
+
+const typeLabels: Record<string, { en: string; es: string }> = {
+  "project": { en: "Project Squad", es: "Equipo de Proyecto" },
+  "motivation": { en: "Motivation Circle", es: "Círculo de Motivación" },
+  "skill-swap": { en: "Skill-Swap Pair", es: "Intercambio de Habilidades" },
 }
 
 export default function GroupDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params)
   const { language } = useLanguage()
   const [user, setUser] = useState<User | null>(null)
+  const [group, setGroup] = useState<Group | null>(null)
+  const [members, setMembers] = useState<(Profile & { role?: string })[]>(fallbackMembers as never[])
+  const [loading, setLoading] = useState(true)
   const [showAuthDialog, setShowAuthDialog] = useState(false)
   const [newMessage, setNewMessage] = useState("")
+  const [progressItems, setProgressItems] = useState(fallbackProgressItems)
+  const [messages, setMessages] = useState(fallbackMessages)
+  const [activityFeed, setActivityFeed] = useState(fallbackActivity)
 
   useEffect(() => {
     const supabase = createClient()
@@ -74,6 +84,55 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
       setUser(data.user)
     })
   }, [])
+
+  useEffect(() => {
+    async function fetchGroupData() {
+      setLoading(true)
+      const supabase = createClient()
+      
+      // Fetch group
+      const { data: groupData, error: groupError } = await supabase
+        .from("Groups")
+        .select("*")
+        .eq("id", resolvedParams.id)
+        .single()
+      
+      if (groupError) {
+        console.error("[v0] Error fetching group:", groupError)
+      } else if (groupData) {
+        setGroup(groupData)
+      }
+      
+      // Fetch group members
+      const { data: memberData, error: memberError } = await supabase
+        .from("Group Members")
+        .select("user_id, role")
+        .eq("group_id", resolvedParams.id)
+      
+      if (!memberError && memberData && memberData.length > 0) {
+        const userIds = memberData.map(m => m.user_id).filter(Boolean)
+        
+        if (userIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from("Users")
+            .select("*")
+            .in("id", userIds)
+          
+          if (profiles) {
+            const membersWithRoles = profiles.map(p => ({
+              ...p,
+              role: memberData.find(m => m.user_id === p.id)?.role || "Member"
+            }))
+            setMembers(membersWithRoles)
+          }
+        }
+      }
+      
+      setLoading(false)
+    }
+    
+    fetchGroupData()
+  }, [resolvedParams.id])
 
   const handleAuthRequired = (action: () => void) => {
     if (!user) {
@@ -83,35 +142,90 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
     action()
   }
 
-  const completedTasks = mockGroup.progressItems.filter(item => item.completed).length
-  const totalTasks = mockGroup.progressItems.length
+  const completedTasks = progressItems.filter(item => item.completed).length
+  const totalTasks = progressItems.length
   const progressPercentage = (completedTasks / totalTasks) * 100
 
   const handleSendMessage = () => {
     handleAuthRequired(() => {
       if (newMessage.trim()) {
-        // In production, send to Supabase
         setNewMessage("")
       }
     })
   }
+
+  const toggleProgressItem = (itemId: string) => {
+    handleAuthRequired(() => {
+      setProgressItems(prev => 
+        prev.map(item => 
+          item.id === itemId ? { ...item, completed: !item.completed } : item
+        )
+      )
+    })
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="pt-28 pb-16 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </main>
+        <Footer />
+      </div>
+    )
+  }
+
+  if (!group) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="pt-28 pb-16">
+          <div className="container mx-auto px-4 text-center">
+            <h1 className="text-2xl font-bold mb-4">
+              {language === "es" ? "Grupo no encontrado" : "Group not found"}
+            </h1>
+            <Button asChild>
+              <Link href="/groups">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                {language === "es" ? "Volver a Grupos" : "Back to Groups"}
+              </Link>
+            </Button>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    )
+  }
+
+  const groupType = group.type || "project"
+  const typeLabel = typeLabels[groupType] 
+    ? (language === "es" ? typeLabels[groupType].es : typeLabels[groupType].en)
+    : group.type
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="pt-28 pb-16">
         <div className="container mx-auto px-4">
+          <Button variant="ghost" asChild className="mb-6 rounded-xl">
+            <Link href="/groups">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              {language === "es" ? "Volver" : "Back"}
+            </Link>
+          </Button>
+
           {/* Group Header */}
           <div className="mb-8">
             <div className="flex items-start justify-between flex-wrap gap-4">
               <div>
-                <Badge className="mb-2 rounded-full">{mockGroup.type}</Badge>
-                <h1 className="text-3xl font-bold text-foreground mb-2">{mockGroup.name}</h1>
-                <p className="text-muted-foreground max-w-2xl">{mockGroup.description}</p>
+                <Badge className="mb-2 rounded-full">{typeLabel}</Badge>
+                <h1 className="text-3xl font-bold text-foreground mb-2">{group.name}</h1>
+                <p className="text-muted-foreground max-w-2xl">{group.description}</p>
                 <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Users className="h-4 w-4" />
-                    {mockGroup.memberCount} {language === "es" ? "miembros" : "members"}
+                    {members.length} {language === "es" ? "miembros" : "members"}
                   </span>
                 </div>
               </div>
@@ -165,12 +279,13 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
                   </div>
 
                   <div className="space-y-4">
-                    {mockGroup.progressItems.map((item) => (
+                    {progressItems.map((item) => (
                       <div 
                         key={item.id} 
-                        className={`flex items-center gap-4 p-4 rounded-xl border ${
+                        className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer ${
                           item.completed ? "bg-primary/5 border-primary/20" : "bg-muted/50 border-border"
                         }`}
+                        onClick={() => toggleProgressItem(item.id)}
                       >
                         {item.completed ? (
                           <CheckCircle2 className="h-6 w-6 text-primary shrink-0" />
@@ -178,7 +293,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
                           <Circle className="h-6 w-6 text-muted-foreground shrink-0" />
                         )}
                         <div className="flex-1">
-                          <p className={`font-medium ${item.completed ? "text-primary" : "text-foreground"}`}>
+                          <p className={`font-medium ${item.completed ? "text-primary line-through" : "text-foreground"}`}>
                             {item.title}
                           </p>
                           <p className="text-sm text-muted-foreground flex items-center gap-1">
@@ -186,16 +301,6 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
                             {language === "es" ? "Fecha límite:" : "Due:"} {item.dueDate}
                           </p>
                         </div>
-                        {!item.completed && (
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="rounded-lg"
-                            onClick={() => handleAuthRequired(() => {})}
-                          >
-                            {language === "es" ? "Marcar" : "Mark Done"}
-                          </Button>
-                        )}
                       </div>
                     ))}
                   </div>
@@ -211,16 +316,16 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-4 md:grid-cols-2">
-                    {mockGroup.members.map((member) => (
+                    {members.map((member) => (
                       <div key={member.id} className="flex items-center gap-4 p-4 rounded-xl border border-border">
                         <Avatar className="h-12 w-12">
                           <AvatarFallback className="bg-primary/20 text-primary">
-                            {member.name.split(" ").map(n => n[0]).join("")}
+                            {(member.full_name || "U").split(" ").map(n => n[0]).join("")}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
-                          <p className="font-medium text-foreground">{member.name}</p>
-                          <p className="text-sm text-muted-foreground">{member.location}</p>
+                          <p className="font-medium text-foreground">{member.full_name || "Unknown"}</p>
+                          <p className="text-sm text-muted-foreground">{member.background || member.location || ""}</p>
                         </div>
                         {member.role === "Admin" && (
                           <Badge variant="secondary" className="rounded-full">Admin</Badge>
@@ -249,7 +354,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
                 <CardContent>
                   <ScrollArea className="h-80 mb-4 p-4 border border-border rounded-xl">
                     <div className="space-y-4">
-                      {mockGroup.messages.map((message) => (
+                      {messages.map((message) => (
                         <div key={message.id} className="flex gap-3">
                           <Avatar className="h-8 w-8 shrink-0">
                             <AvatarFallback className="bg-secondary/20 text-secondary text-xs">
@@ -291,7 +396,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {mockGroup.activityFeed.map((activity) => (
+                    {activityFeed.map((activity) => (
                       <div key={activity.id} className="flex items-start gap-4 p-4 rounded-xl bg-muted/50">
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/20">
                           <Activity className="h-5 w-5 text-primary" />

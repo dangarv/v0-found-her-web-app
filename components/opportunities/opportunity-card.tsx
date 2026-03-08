@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Bookmark, ExternalLink, MapPin, Calendar, DollarSign } from "lucide-react"
+import { Bookmark, ExternalLink, MapPin, Calendar, GraduationCap, Globe } from "lucide-react"
 import { Opportunity } from "@/lib/types"
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
@@ -15,13 +15,21 @@ interface OpportunityCardProps {
   opportunity: Opportunity
 }
 
-const categoryColors: Record<string, string> = {
+const typeColors: Record<string, string> = {
   scholarship: "bg-chart-1/10 text-chart-1 border-chart-1/20",
   internship: "bg-chart-2/10 text-chart-2 border-chart-2/20",
   grant: "bg-chart-3/10 text-chart-3 border-chart-3/20",
   fellowship: "bg-chart-4/10 text-chart-4 border-chart-4/20",
   competition: "bg-secondary/10 text-secondary border-secondary/20",
   program: "bg-primary/10 text-primary border-primary/20",
+  research: "bg-chart-5/10 text-chart-5 border-chart-5/20",
+  bootcamp: "bg-primary/10 text-primary border-primary/20",
+  conference: "bg-chart-3/10 text-chart-3 border-chart-3/20",
+}
+
+const levelColors: Record<string, string> = {
+  high_school: "bg-pink-100 text-pink-700 border-pink-200",
+  undergraduate: "bg-purple-100 text-purple-700 border-purple-200",
 }
 
 export function OpportunityCard({ opportunity }: OpportunityCardProps) {
@@ -49,34 +57,46 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return t('noDeadline')
-    return new Date(dateString).toLocaleDateString("en-US", {
+    // Handle various date formats
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) return dateString
+    return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
     })
   }
 
-  const formatAmount = (amount: number | null) => {
-    if (!amount) return null
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      maximumFractionDigits: 0,
-    }).format(amount)
-  }
+  const isRemote = opportunity.modality?.toLowerCase().includes("remote") || 
+                   opportunity.modality?.toLowerCase().includes("virtual") ||
+                   opportunity.modality?.toLowerCase().includes("online")
+
+  const opportunityType = opportunity.type?.toLowerCase() || "program"
+  const typeColor = typeColors[opportunityType] || typeColors.program
 
   return (
     <>
-      <Card className="border-border/50 hover:shadow-md transition-shadow">
+      <Card className="border-border/50 hover:shadow-md transition-shadow rounded-2xl">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-2">
-                <Badge variant="outline" className={categoryColors[opportunity.category]}>
-                  {opportunity.category}
-                </Badge>
-                {opportunity.is_remote && (
-                  <Badge variant="secondary" className="bg-secondary text-secondary-foreground">{t('remote')}</Badge>
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                {opportunity.type && (
+                  <Badge variant="outline" className={typeColor}>
+                    {opportunity.type}
+                  </Badge>
+                )}
+                {opportunity.level && (
+                  <Badge variant="outline" className={levelColors[opportunity.level] || levelColors.undergraduate}>
+                    <GraduationCap className="h-3 w-3 mr-1" />
+                    {opportunity.level === "high_school" ? "High School" : "Undergraduate"}
+                  </Badge>
+                )}
+                {isRemote && (
+                  <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
+                    <Globe className="h-3 w-3 mr-1" />
+                    {t('remote')}
+                  </Badge>
                 )}
               </div>
               <h3 className="font-semibold text-lg text-foreground leading-tight">
@@ -101,49 +121,51 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
           </p>
 
           <div className="flex flex-wrap items-center gap-4 text-sm">
-            {(opportunity.location || opportunity.is_remote) && (
+            {opportunity.scope && (
               <div className="flex items-center gap-1 text-muted-foreground">
                 <MapPin className="h-4 w-4" />
-                <span>{opportunity.is_remote ? t('remote') : opportunity.location}</span>
+                <span>{opportunity.scope}</span>
               </div>
             )}
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <Calendar className="h-4 w-4" />
-              <span>{formatDate(opportunity.deadline)}</span>
-            </div>
-            {opportunity.amount && (
+            {opportunity.deadline && (
               <div className="flex items-center gap-1 text-muted-foreground">
-                <DollarSign className="h-4 w-4" />
-                <span>{formatAmount(opportunity.amount)}</span>
+                <Calendar className="h-4 w-4" />
+                <span>{formatDate(opportunity.deadline)}</span>
               </div>
+            )}
+            {opportunity.field && (
+              <Badge variant="outline" className="text-xs">
+                {opportunity.field}
+              </Badge>
             )}
           </div>
 
-          {opportunity.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {opportunity.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
+          {opportunity.eligibility && (
+            <p className="text-xs text-muted-foreground">
+              <span className="font-medium">Eligibility:</span> {opportunity.eligibility}
+            </p>
+          )}
+
+          {opportunity.financial_aid && (
+            <p className="text-xs text-primary font-medium">
+              {opportunity.financial_aid}
+            </p>
           )}
 
           <div className="flex items-center gap-2 pt-2">
             <Button asChild className="flex-1 rounded-xl" size="lg">
-              <Link href={`/opportunities/${opportunity.id}`}>
+              <Link href={`/opportunities/${opportunity.id}?level=${opportunity.level}`}>
                 {t('learnMore')}
               </Link>
             </Button>
-            <Button variant="outline" className="rounded-xl" size="lg" asChild>
-              <a href={opportunity.url} target="_blank" rel="noopener noreferrer">
-                {t('apply')}
-                <ExternalLink className="ml-2 h-4 w-4" />
-              </a>
-            </Button>
+            {opportunity.link && (
+              <Button variant="outline" className="rounded-xl" size="lg" asChild>
+                <a href={opportunity.link} target="_blank" rel="noopener noreferrer">
+                  {t('apply')}
+                  <ExternalLink className="ml-2 h-4 w-4" />
+                </a>
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>

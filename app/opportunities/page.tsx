@@ -11,6 +11,8 @@ export default function OpportunitiesPage() {
   const { t } = useLanguage()
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
   const [selectedLocation, setSelectedLocation] = useState<string>("all")
+  const [selectedLevel, setSelectedLevel] = useState<string>("all")
+  const [selectedField, setSelectedField] = useState<string>("all")
   const [searchQuery, setSearchQuery] = useState("")
 
   return (
@@ -39,6 +41,8 @@ export default function OpportunitiesPage() {
               <OpportunitiesContent
                 selectedCategory={selectedCategory}
                 selectedLocation={selectedLocation}
+                selectedLevel={selectedLevel}
+                selectedField={selectedField}
                 searchQuery={searchQuery}
               />
             </div>

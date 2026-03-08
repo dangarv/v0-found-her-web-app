@@ -5,72 +5,10 @@ import { Footer } from "@/components/landing/footer"
 import { GroupCard } from "@/components/groups/group-card"
 import { useLanguage } from "@/lib/language-context"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Search, Rocket, Heart, RefreshCw } from "lucide-react"
-import { useState } from "react"
-
-const mockGroups = [
-  {
-    id: "1",
-    name: "Fulbright Application Squad",
-    description: "A motivation circle for women applying to Fulbright scholarships. Weekly check-ins, essay reviews, and interview prep.",
-    memberCount: 12,
-    type: "Motivation Circle",
-    category: "motivation",
-    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=200&fit=crop",
-    isJoined: false,
-  },
-  {
-    id: "2",
-    name: "LatAm EdTech Founders",
-    description: "Building the future of education in Latin America. Join us if you're working on EdTech startups or products.",
-    memberCount: 28,
-    type: "Project Squad",
-    category: "project",
-    image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400&h=200&fit=crop",
-    isJoined: false,
-  },
-  {
-    id: "3",
-    name: "UX Design Skill Exchange",
-    description: "1-on-1 reciprocal mentorship for designers. Share your expertise and learn new skills from peers.",
-    memberCount: 8,
-    type: "Skill-Swap Pair",
-    category: "skill-swap",
-    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=200&fit=crop",
-    isJoined: false,
-  },
-  {
-    id: "4",
-    name: "Climate Tech Builders",
-    description: "Project squad for women building climate solutions. From ideation to launch, we support each other's ventures.",
-    memberCount: 45,
-    type: "Project Squad",
-    category: "project",
-    image: "https://images.unsplash.com/photo-1532601224476-15c79f2f7a51?w=400&h=200&fit=crop",
-    isJoined: false,
-  },
-  {
-    id: "5",
-    name: "Grad School Motivation Circle",
-    description: "Applying to graduate programs? Join us for weekly accountability, SOP reviews, and emotional support.",
-    memberCount: 18,
-    type: "Motivation Circle",
-    category: "motivation",
-    image: "https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?w=400&h=200&fit=crop",
-    isJoined: false,
-  },
-  {
-    id: "6",
-    name: "Marketing & Dev Exchange",
-    description: "Pair up with someone who has complementary skills. Marketers teach growth, developers teach code.",
-    memberCount: 14,
-    type: "Skill-Swap Pair",
-    category: "skill-swap",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=200&fit=crop",
-    isJoined: false,
-  },
-]
+import { Search, Rocket, Heart, RefreshCw, Loader2 } from "lucide-react"
+import { useState, useEffect } from "react"
+import { createClient } from "@/lib/supabase/client"
+import type { Group } from "@/lib/types"
 
 const groupTypes = [
   { 
@@ -106,17 +44,97 @@ const groupTypes = [
   },
 ]
 
+// Fallback mock data for when database is empty
+const fallbackGroups = [
+  {
+    id: "1",
+    name: "Fulbright Application Squad",
+    description: "A motivation circle for women applying to Fulbright scholarships. Weekly check-ins, essay reviews, and interview prep.",
+    type: "motivation",
+    creator_id: null,
+    member_count: 12,
+  },
+  {
+    id: "2",
+    name: "LatAm EdTech Founders",
+    description: "Building the future of education in Latin America. Join us if you're working on EdTech startups or products.",
+    type: "project",
+    creator_id: null,
+    member_count: 28,
+  },
+  {
+    id: "3",
+    name: "UX Design Skill Exchange",
+    description: "1-on-1 reciprocal mentorship for designers. Share your expertise and learn new skills from peers.",
+    type: "skill-swap",
+    creator_id: null,
+    member_count: 8,
+  },
+  {
+    id: "4",
+    name: "Climate Tech Builders",
+    description: "Project squad for women building climate solutions. From ideation to launch, we support each other's ventures.",
+    type: "project",
+    creator_id: null,
+    member_count: 45,
+  },
+  {
+    id: "5",
+    name: "Grad School Motivation Circle",
+    description: "Applying to graduate programs? Join us for weekly accountability, SOP reviews, and emotional support.",
+    type: "motivation",
+    creator_id: null,
+    member_count: 18,
+  },
+  {
+    id: "6",
+    name: "Marketing & Dev Exchange",
+    description: "Pair up with someone who has complementary skills. Marketers teach growth, developers teach code.",
+    type: "skill-swap",
+    creator_id: null,
+    member_count: 14,
+  },
+]
+
 export default function GroupsPage() {
   const { t, language } = useLanguage()
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedType, setSelectedType] = useState("all")
+  const [groups, setGroups] = useState<Group[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const filteredGroups = mockGroups.filter((group) => {
-    const matchesSearch = 
-      group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      group.description.toLowerCase().includes(searchQuery.toLowerCase())
+  useEffect(() => {
+    async function fetchGroups() {
+      setLoading(true)
+      const supabase = createClient()
+      
+      const { data, error } = await supabase
+        .from("Groups")
+        .select("*")
+      
+      if (error) {
+        console.error("[v0] Error fetching groups:", error)
+        // Use fallback data if error
+        setGroups(fallbackGroups as Group[])
+      } else if (data && data.length > 0) {
+        setGroups(data)
+      } else {
+        // Use fallback data if empty
+        setGroups(fallbackGroups as Group[])
+      }
+      
+      setLoading(false)
+    }
     
-    const matchesType = selectedType === "all" || group.category === selectedType
+    fetchGroups()
+  }, [])
+
+  const filteredGroups = groups.filter((group) => {
+    const matchesSearch = 
+      (group.name?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+      (group.description?.toLowerCase() || "").includes(searchQuery.toLowerCase())
+    
+    const matchesType = selectedType === "all" || group.type === selectedType
 
     return matchesSearch && matchesType
   })
@@ -176,13 +194,19 @@ export default function GroupsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredGroups.map((group) => (
-              <GroupCard key={group.id} group={group} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredGroups.map((group) => (
+                <GroupCard key={group.id} group={group} />
+              ))}
+            </div>
+          )}
 
-          {filteredGroups.length === 0 && (
+          {!loading && filteredGroups.length === 0 && (
             <div className="text-center py-16">
               <p className="text-muted-foreground">{t('noGroupsFound')}</p>
             </div>
