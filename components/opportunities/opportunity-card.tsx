@@ -36,10 +36,11 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
   const [isSaved, setIsSaved] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
   const [showAuthDialog, setShowAuthDialog] = useState(false)
-  const [formattedDeadline, setFormattedDeadline] = useState<string>("")
+  const [isMounted, setIsMounted] = useState(false)
   const { t } = useLanguage()
 
   useEffect(() => {
+    setIsMounted(true)
     const checkAuth = async () => {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
@@ -48,20 +49,14 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
     checkAuth()
   }, [])
 
-  // Format date only on client to avoid hydration mismatch
-  useEffect(() => {
-    if (!opportunity.deadline) {
-      setFormattedDeadline(t('noDeadline'))
-      return
-    }
+  // Format date only after mounting to avoid hydration mismatch
+  const formatDeadline = () => {
+    if (!opportunity.deadline) return t('noDeadline')
     const date = new Date(opportunity.deadline)
-    if (isNaN(date.getTime())) {
-      setFormattedDeadline(opportunity.deadline)
-      return
-    }
+    if (isNaN(date.getTime())) return opportunity.deadline
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    setFormattedDeadline(`${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`)
-  }, [opportunity.deadline, t])
+    return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`
+  }
 
   const handleSave = () => {
     if (!isAuthenticated) {
@@ -131,10 +126,10 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
                 <span>{opportunity.scope}</span>
               </div>
             )}
-            {opportunity.deadline && formattedDeadline && (
+            {opportunity.deadline && isMounted && (
               <div className="flex items-center gap-1 text-muted-foreground">
                 <Calendar className="h-4 w-4" />
-                <span>{formattedDeadline}</span>
+                <span>{formatDeadline()}</span>
               </div>
             )}
             {opportunity.field && (
