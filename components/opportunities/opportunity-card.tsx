@@ -57,14 +57,11 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return t('noDeadline')
-    // Handle various date formats
+    // Handle various date formats - use UTC to avoid hydration mismatch
     const date = new Date(dateString)
     if (isNaN(date.getTime())) return dateString
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    })
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    return `${months[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}`
   }
 
   const isRemote = opportunity.modality?.toLowerCase().includes("remote") || 
