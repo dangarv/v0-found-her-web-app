@@ -10,6 +10,8 @@ interface Translations {
   stories: string
   opportunities: string
   collaborate: string
+  match: string
+  groups: string
   login: string
   getStarted: string
   // Hero
@@ -40,6 +42,11 @@ interface Translations {
   authRequired: string
   authRequiredMessage: string
   signUp: string
+  // Page Subtitles
+  opportunitiesSubtitle: string
+  collaborateSubtitle: string
+  matchSubtitle: string
+  groupsSubtitle: string
   // Common
   apply: string
   save: string
@@ -54,6 +61,15 @@ interface Translations {
   deadline: string
   location: string
   noDeadline: string
+  createPost: string
+  searchPosts: string
+  createCollaborationPost: string
+  searchByNameOrSkills: string
+  noMatchesFound: string
+  searchGroups: string
+  noGroupsFound: string
+  joinGroup: string
+  members: string
 }
 
 const translations: Record<Language, Translations> = {
@@ -63,6 +79,8 @@ const translations: Record<Language, Translations> = {
     stories: "Stories",
     opportunities: "Opportunities",
     collaborate: "Collaborate",
+    match: "Match",
+    groups: "Groups",
     login: "Log in",
     getStarted: "Get Started",
     // Hero
@@ -93,6 +111,11 @@ const translations: Record<Language, Translations> = {
     authRequired: "Sign in required",
     authRequiredMessage: "You need to sign in or create an account to perform this action.",
     signUp: "Sign up",
+    // Page Subtitles
+    opportunitiesSubtitle: "Discover scholarships, internships, grants, and programs curated for ambitious young women.",
+    collaborateSubtitle: "Find project partners and build something amazing together.",
+    matchSubtitle: "Connect with people who share your interests and have complementary skills.",
+    groupsSubtitle: "Join communities of like-minded women and grow together.",
     // Common
     apply: "Apply Now",
     save: "Save",
@@ -107,6 +130,15 @@ const translations: Record<Language, Translations> = {
     deadline: "Deadline",
     location: "Location",
     noDeadline: "No deadline",
+    createPost: "Create Post",
+    searchPosts: "Search posts...",
+    createCollaborationPost: "create a collaboration post",
+    searchByNameOrSkills: "Search by name or skills...",
+    noMatchesFound: "No matches found. Try adjusting your filters.",
+    searchGroups: "Search groups...",
+    noGroupsFound: "No groups found. Try adjusting your filters.",
+    joinGroup: "Join Group",
+    members: "members",
   },
   es: {
     // Header
@@ -114,6 +146,8 @@ const translations: Record<Language, Translations> = {
     stories: "Historias",
     opportunities: "Oportunidades",
     collaborate: "Colaborar",
+    match: "Conectar",
+    groups: "Grupos",
     login: "Iniciar sesión",
     getStarted: "Comenzar",
     // Hero
@@ -144,6 +178,11 @@ const translations: Record<Language, Translations> = {
     authRequired: "Inicio de sesión requerido",
     authRequiredMessage: "Necesitas iniciar sesión o crear una cuenta para realizar esta acción.",
     signUp: "Registrarse",
+    // Page Subtitles
+    opportunitiesSubtitle: "Descubre becas, pasantías, subvenciones y programas seleccionados para mujeres jóvenes ambiciosas.",
+    collaborateSubtitle: "Encuentra socias de proyecto y construye algo increíble juntas.",
+    matchSubtitle: "Conecta con personas que comparten tus intereses y tienen habilidades complementarias.",
+    groupsSubtitle: "Únete a comunidades de mujeres afines y crezcan juntas.",
     // Common
     apply: "Aplicar Ahora",
     save: "Guardar",
@@ -158,6 +197,15 @@ const translations: Record<Language, Translations> = {
     deadline: "Fecha límite",
     location: "Ubicación",
     noDeadline: "Sin fecha límite",
+    createPost: "Crear Publicación",
+    searchPosts: "Buscar publicaciones...",
+    createCollaborationPost: "crear una publicación de colaboración",
+    searchByNameOrSkills: "Buscar por nombre o habilidades...",
+    noMatchesFound: "No se encontraron coincidencias. Intenta ajustar los filtros.",
+    searchGroups: "Buscar grupos...",
+    noGroupsFound: "No se encontraron grupos. Intenta ajustar los filtros.",
+    joinGroup: "Unirse al Grupo",
+    members: "miembros",
   },
 }
 
