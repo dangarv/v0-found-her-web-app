@@ -1,7 +1,12 @@
+"use client"
+
 import { GroupCard } from "@/components/groups/group-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Plus, Search } from "lucide-react"
+import { useState, useEffect } from "react"
+import { createClient } from "@/lib/supabase/client"
+import { AuthRequiredDialog } from "@/components/auth-required-dialog"
 
 // Mock data
 const mockGroups = [
@@ -14,7 +19,7 @@ const mockGroups = [
     created_by: "user1",
     created_at: new Date().toISOString(),
     member_count: 1250,
-    is_member: true,
+    is_member: false,
   },
   {
     id: "2",
@@ -36,7 +41,7 @@ const mockGroups = [
     created_by: "user3",
     created_at: new Date().toISOString(),
     member_count: 2100,
-    is_member: true,
+    is_member: false,
   },
   {
     id: "4",
@@ -74,6 +79,26 @@ const mockGroups = [
 ]
 
 export default function GroupsPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
+  const [showAuthDialog, setShowAuthDialog] = useState(false)
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      setIsAuthenticated(!!user)
+    }
+    checkAuth()
+  }, [])
+
+  const handleCreateGroup = () => {
+    if (!isAuthenticated) {
+      setShowAuthDialog(true)
+      return
+    }
+    // Open create group dialog
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -83,7 +108,7 @@ export default function GroupsPage() {
             Join communities based on your interests and connect with like-minded women.
           </p>
         </div>
-        <Button>
+        <Button className="rounded-xl" onClick={handleCreateGroup}>
           <Plus className="h-4 w-4 mr-2" />
           Create Group
         </Button>
@@ -91,30 +116,19 @@ export default function GroupsPage() {
 
       <div className="relative max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Search groups..." className="pl-9" />
-      </div>
-
-      <div>
-        <h2 className="text-lg font-semibold text-foreground mb-4">Your Groups</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {mockGroups
-            .filter((g) => g.is_member)
-            .map((group) => (
-              <GroupCard key={group.id} group={group} />
-            ))}
-        </div>
+        <Input placeholder="Search groups..." className="pl-9 rounded-xl" />
       </div>
 
       <div>
         <h2 className="text-lg font-semibold text-foreground mb-4">Discover Groups</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {mockGroups
-            .filter((g) => !g.is_member)
-            .map((group) => (
-              <GroupCard key={group.id} group={group} />
-            ))}
+          {mockGroups.map((group) => (
+            <GroupCard key={group.id} group={group} />
+          ))}
         </div>
       </div>
+
+      <AuthRequiredDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} />
     </div>
   )
 }

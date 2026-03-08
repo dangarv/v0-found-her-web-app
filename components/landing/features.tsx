@@ -1,50 +1,54 @@
+"use client"
+
 import { Search, Users, MessageCircle, Bookmark, TrendingUp, Shield } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
-
-const features = [
-  {
-    icon: Search,
-    title: "Discover Opportunities",
-    description: "Browse scholarships, internships, grants, and fellowships tailored for young women across the globe.",
-  },
-  {
-    icon: Users,
-    title: "Find Collaborators",
-    description: "Connect with like-minded women to build projects, start ventures, or find mentorship.",
-  },
-  {
-    icon: MessageCircle,
-    title: "Join Communities",
-    description: "Engage with groups based on your interests, industry, or location to expand your network.",
-  },
-  {
-    icon: Bookmark,
-    title: "Track Applications",
-    description: "Save opportunities and manage your application progress all in one place.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Career Growth",
-    description: "Access resources and guidance to help you navigate your professional journey.",
-  },
-  {
-    icon: Shield,
-    title: "Safe Space",
-    description: "A verified community built by women, for women, ensuring a supportive environment.",
-  },
-]
+import { useLanguage } from "@/lib/language-context"
 
 export function Features() {
+  const { t } = useLanguage()
+
+  const features = [
+    {
+      icon: Search,
+      title: t.opportunitiesFeatureTitle,
+      description: t.opportunitiesFeatureDescription,
+    },
+    {
+      icon: Users,
+      title: t.collaborateFeatureTitle,
+      description: t.collaborateFeatureDescription,
+    },
+    {
+      icon: MessageCircle,
+      title: t.groupsFeatureTitle,
+      description: t.groupsFeatureDescription,
+    },
+    {
+      icon: Bookmark,
+      title: t.matchFeatureTitle,
+      description: t.matchFeatureDescription,
+    },
+    {
+      icon: TrendingUp,
+      title: "Career Growth",
+      description: "Access resources and guidance to help you navigate your professional journey.",
+    },
+    {
+      icon: Shield,
+      title: "Safe Space",
+      description: "A verified community built by women, for women, ensuring a supportive environment.",
+    },
+  ]
+
   return (
     <section id="features" className="py-20 md:py-32 bg-muted/30">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground text-balance">
-            Everything you need to thrive
+            {t.featuresTitle}
           </h2>
           <p className="mt-4 text-lg text-muted-foreground text-pretty">
-            FoundHer provides all the tools and resources to help you discover opportunities 
-            and build meaningful connections.
+            {t.featuresSubtitle}
           </p>
         </div>
 

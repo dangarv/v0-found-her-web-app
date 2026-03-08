@@ -5,7 +5,10 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Bookmark, ExternalLink, MapPin, Calendar, DollarSign } from "lucide-react"
 import { Opportunity } from "@/lib/types"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { createClient } from "@/lib/supabase/client"
+import { AuthRequiredDialog } from "@/components/auth-required-dialog"
+import { useLanguage } from "@/lib/language-context"
 
 interface OpportunityCardProps {
   opportunity: Opportunity
@@ -16,15 +19,35 @@ const categoryColors: Record<string, string> = {
   internship: "bg-chart-2/10 text-chart-2 border-chart-2/20",
   grant: "bg-chart-3/10 text-chart-3 border-chart-3/20",
   fellowship: "bg-chart-4/10 text-chart-4 border-chart-4/20",
-  competition: "bg-accent/10 text-accent border-accent/20",
+  competition: "bg-secondary/10 text-secondary border-secondary/20",
   program: "bg-primary/10 text-primary border-primary/20",
 }
 
 export function OpportunityCard({ opportunity }: OpportunityCardProps) {
   const [isSaved, setIsSaved] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
+  const [showAuthDialog, setShowAuthDialog] = useState(false)
+  const { t } = useLanguage()
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      setIsAuthenticated(!!user)
+    }
+    checkAuth()
+  }, [])
+
+  const handleSave = () => {
+    if (!isAuthenticated) {
+      setShowAuthDialog(true)
+      return
+    }
+    setIsSaved(!isSaved)
+  }
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return "No deadline"
+    if (!dateString) return t.noDeadline
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -42,81 +65,85 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
   }
 
   return (
-    <Card className="border-border/50 hover:shadow-md transition-shadow">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2">
-              <Badge variant="outline" className={categoryColors[opportunity.category]}>
-                {opportunity.category}
-              </Badge>
-              {opportunity.is_remote && (
-                <Badge variant="secondary" className="bg-secondary text-secondary-foreground">Remote</Badge>
-              )}
+    <>
+      <Card className="border-border/50 hover:shadow-md transition-shadow">
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-2">
+                <Badge variant="outline" className={categoryColors[opportunity.category]}>
+                  {opportunity.category}
+                </Badge>
+                {opportunity.is_remote && (
+                  <Badge variant="secondary" className="bg-secondary text-secondary-foreground">{t.remote}</Badge>
+                )}
+              </div>
+              <h3 className="font-semibold text-lg text-foreground leading-tight">
+                {opportunity.title}
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1">{opportunity.organization}</p>
             </div>
-            <h3 className="font-semibold text-lg text-foreground leading-tight">
-              {opportunity.title}
-            </h3>
-            <p className="text-sm text-muted-foreground mt-1">{opportunity.organization}</p>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleSave}
+              className={isSaved ? "text-primary" : "text-muted-foreground"}
+            >
+              <Bookmark className={`h-5 w-5 ${isSaved ? "fill-current" : ""}`} />
+              <span className="sr-only">{isSaved ? "Unsave" : "Save"} opportunity</span>
+            </Button>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsSaved(!isSaved)}
-            className={isSaved ? "text-primary" : "text-muted-foreground"}
-          >
-            <Bookmark className={`h-5 w-5 ${isSaved ? "fill-current" : ""}`} />
-            <span className="sr-only">{isSaved ? "Unsave" : "Save"} opportunity</span>
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-sm text-muted-foreground line-clamp-2">
-          {opportunity.description}
-        </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground line-clamp-2">
+            {opportunity.description}
+          </p>
 
-        <div className="flex flex-wrap items-center gap-4 text-sm">
-          {(opportunity.location || opportunity.is_remote) && (
+          <div className="flex flex-wrap items-center gap-4 text-sm">
+            {(opportunity.location || opportunity.is_remote) && (
+              <div className="flex items-center gap-1 text-muted-foreground">
+                <MapPin className="h-4 w-4" />
+                <span>{opportunity.is_remote ? t.remote : opportunity.location}</span>
+              </div>
+            )}
             <div className="flex items-center gap-1 text-muted-foreground">
-              <MapPin className="h-4 w-4" />
-              <span>{opportunity.is_remote ? "Remote" : opportunity.location}</span>
+              <Calendar className="h-4 w-4" />
+              <span>{formatDate(opportunity.deadline)}</span>
+            </div>
+            {opportunity.amount && (
+              <div className="flex items-center gap-1 text-muted-foreground">
+                <DollarSign className="h-4 w-4" />
+                <span>{formatAmount(opportunity.amount)}</span>
+              </div>
+            )}
+          </div>
+
+          {opportunity.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {opportunity.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground"
+                >
+                  {tag}
+                </span>
+              ))}
             </div>
           )}
-          <div className="flex items-center gap-1 text-muted-foreground">
-            <Calendar className="h-4 w-4" />
-            <span>{formatDate(opportunity.deadline)}</span>
-          </div>
-          {opportunity.amount && (
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <DollarSign className="h-4 w-4" />
-              <span>{formatAmount(opportunity.amount)}</span>
-            </div>
-          )}
-        </div>
 
-        {opportunity.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {opportunity.tags.map((tag) => (
-              <span
-                key={tag}
-                className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground"
-              >
-                {tag}
-              </span>
-            ))}
+          <div className="flex items-center gap-2 pt-2">
+            <Button asChild className="flex-1 rounded-xl">
+              <a href={opportunity.url} target="_blank" rel="noopener noreferrer">
+                {t.apply}
+                <ExternalLink className="ml-2 h-4 w-4" />
+              </a>
+            </Button>
+            <Button variant="outline" className="rounded-xl">{t.learnMore}</Button>
           </div>
-        )}
+        </CardContent>
+      </Card>
 
-        <div className="flex items-center gap-2 pt-2">
-          <Button asChild className="flex-1">
-            <a href={opportunity.url} target="_blank" rel="noopener noreferrer">
-              Apply Now
-              <ExternalLink className="ml-2 h-4 w-4" />
-            </a>
-          </Button>
-          <Button variant="outline">Learn More</Button>
-        </div>
-      </CardContent>
-    </Card>
+      <AuthRequiredDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} />
+    </>
   )
 }

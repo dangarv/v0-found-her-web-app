@@ -54,13 +54,13 @@ export default function Page() {
         <div className="flex flex-col gap-6">
           <div className="flex justify-center">
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary">
                 <Sparkles className="h-5 w-5 text-primary-foreground" />
               </div>
               <span className="text-2xl font-bold text-foreground">FoundHer</span>
             </Link>
           </div>
-          <Card className="border-border/50">
+          <Card className="border-border/50 rounded-2xl">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl">Welcome back</CardTitle>
               <CardDescription>
@@ -92,7 +92,7 @@ export default function Page() {
                     />
                   </div>
                   {error && <p className="text-sm text-red-500">{error}</p>}
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button type="submit" className="w-full rounded-xl" disabled={isLoading}>
                     {isLoading ? 'Logging in...' : 'Login'}
                   </Button>
                 </div>
