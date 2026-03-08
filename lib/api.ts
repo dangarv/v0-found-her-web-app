@@ -15,56 +15,120 @@ const TABLES = {
   APPLICATION_PROGRESS: "Application Progress",
 }
 
-// Fetch all opportunities from both tables
-export async function fetchOpportunities(filters?: {
-  level?: string
-  type?: string
-  modality?: string
-  field?: string
+interface FetchOpportunitiesFilters {
+  levels?: string[]
+  types?: string[]
+  modalities?: string[]
+  costs?: string[]
+  fields?: string[]
+  genderFocus?: string[]
   search?: string
-}): Promise<Opportunity[]> {
+}
+
+// Fetch all opportunities from both tables with filtering
+export async function fetchOpportunities(filters?: FetchOpportunitiesFilters): Promise<Opportunity[]> {
   const supabase = createClient()
-  
-  let hsQuery = supabase.from(TABLES.HIGH_SCHOOL_OPPORTUNITIES).select("*")
-  let ugQuery = supabase.from(TABLES.UNDERGRADUATE_OPPORTUNITIES).select("*")
-  
-  // Apply filters
-  if (filters?.type && filters.type !== "all") {
-    hsQuery = hsQuery.ilike("type", `%${filters.type}%`)
-    ugQuery = ugQuery.ilike("type", `%${filters.type}%`)
-  }
-  
-  if (filters?.modality && filters.modality !== "all") {
-    hsQuery = hsQuery.ilike("modality", `%${filters.modality}%`)
-    ugQuery = ugQuery.ilike("modality", `%${filters.modality}%`)
-  }
-  
-  if (filters?.field && filters.field !== "all") {
-    hsQuery = hsQuery.ilike("field", `%${filters.field}%`)
-    ugQuery = ugQuery.ilike("field", `%${filters.field}%`)
-  }
-  
-  if (filters?.search) {
-    const searchTerm = `%${filters.search}%`
-    hsQuery = hsQuery.or(`title.ilike.${searchTerm},description.ilike.${searchTerm},organization.ilike.${searchTerm}`)
-    ugQuery = ugQuery.or(`title.ilike.${searchTerm},description.ilike.${searchTerm},organization.ilike.${searchTerm}`)
-  }
-  
-  // Fetch based on level filter
   const results: Opportunity[] = []
   
-  if (!filters?.level || filters.level === "all" || filters.level === "high_school") {
-    const { data: hsData, error: hsError } = await hsQuery
-    if (!hsError && hsData) {
-      results.push(...hsData.map(opp => ({ ...opp, level: "high_school" })))
+  // Determine which tables to query based on level filter
+  const queryHighSchool = !filters?.levels?.length || filters.levels.includes("high_school")
+  const queryUndergraduate = !filters?.levels?.length || filters.levels.includes("undergraduate")
+  
+  // Helper function to apply filters to a query and fetch results
+  async function fetchFromTable(tableName: string, level: string): Promise<Opportunity[]> {
+    const { data, error } = await supabase.from(tableName).select("*")
+    
+    if (error || !data) {
+      console.error(`[v0] Error fetching from ${tableName}:`, error)
+      return []
     }
+    
+    // Apply client-side filtering for complex multi-select filters
+    let filtered = data.map(opp => ({ ...opp, level }))
+    
+    // Filter by type (supports multiple selections)
+    if (filters?.types && filters.types.length > 0) {
+      filtered = filtered.filter(opp => {
+        const oppType = (opp.type || "").toLowerCase()
+        return filters.types!.some(t => oppType.includes(t.toLowerCase()))
+      })
+    }
+    
+    // Filter by modality (supports multiple selections)
+    if (filters?.modalities && filters.modalities.length > 0) {
+      filtered = filtered.filter(opp => {
+        const oppModality = (opp.modality || "").toLowerCase()
+        return filters.modalities!.some(m => oppModality.includes(m.toLowerCase()))
+      })
+    }
+    
+    // Filter by cost (supports multiple selections)
+    if (filters?.costs && filters.costs.length > 0) {
+      filtered = filtered.filter(opp => {
+        const oppCost = (opp.cost || "").toLowerCase()
+        // Check for free vs paid
+        const isFree = oppCost.includes("free") || oppCost === "$0" || oppCost === "0" || oppCost === ""
+        
+        if (filters.costs!.includes("free") && isFree) return true
+        if (filters.costs!.includes("paid") && !isFree) return true
+        return false
+      })
+    }
+    
+    // Filter by field (supports multiple selections)
+    if (filters?.fields && filters.fields.length > 0) {
+      filtered = filtered.filter(opp => {
+        const oppField = (opp.field || "").toLowerCase()
+        return filters.fields!.some(f => oppField.includes(f.toLowerCase()))
+      })
+    }
+    
+    // Filter by gender focus
+    if (filters?.genderFocus && filters.genderFocus.length > 0) {
+      filtered = filtered.filter(opp => {
+        const oppGender = (opp.gender_focus || "").toLowerCase()
+        
+        if (filters.genderFocus!.includes("women-focused")) {
+          return oppGender.includes("women") || oppGender.includes("female") || oppGender.includes("girl")
+        }
+        if (filters.genderFocus!.includes("open to all")) {
+          return oppGender.includes("open") || oppGender.includes("all") || !oppGender
+        }
+        return true
+      })
+    }
+    
+    // Filter by search query
+    if (filters?.search && filters.search.trim()) {
+      const searchLower = filters.search.toLowerCase()
+      filtered = filtered.filter(opp => {
+        const title = (opp.title || "").toLowerCase()
+        const description = (opp.description || "").toLowerCase()
+        const organization = (opp.organization || "").toLowerCase()
+        const field = (opp.field || "").toLowerCase()
+        const type = (opp.type || "").toLowerCase()
+        
+        return title.includes(searchLower) || 
+               description.includes(searchLower) || 
+               organization.includes(searchLower) ||
+               field.includes(searchLower) ||
+               type.includes(searchLower)
+      })
+    }
+    
+    return filtered
   }
   
-  if (!filters?.level || filters.level === "all" || filters.level === "undergraduate") {
-    const { data: ugData, error: ugError } = await ugQuery
-    if (!ugError && ugData) {
-      results.push(...ugData.map(opp => ({ ...opp, level: "undergraduate" })))
-    }
+  // Fetch from High School Opportunities
+  if (queryHighSchool) {
+    const hsResults = await fetchFromTable(TABLES.HIGH_SCHOOL_OPPORTUNITIES, "high_school")
+    results.push(...hsResults)
+  }
+  
+  // Fetch from Undergraduate Opportunities
+  if (queryUndergraduate) {
+    const ugResults = await fetchFromTable(TABLES.UNDERGRADUATE_OPPORTUNITIES, "undergraduate")
+    results.push(...ugResults)
   }
   
   return results

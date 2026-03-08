@@ -6,22 +6,13 @@ import { useLanguage } from "@/lib/language-context"
 import { fetchOpportunities } from "@/lib/api"
 import type { Opportunity } from "@/lib/types"
 import { Loader2 } from "lucide-react"
+import type { OpportunityFilters } from "./opportunities-filters"
 
 interface OpportunitiesContentProps {
-  selectedCategory: string
-  selectedLocation: string
-  selectedLevel: string
-  selectedField: string
-  searchQuery: string
+  filters: OpportunityFilters
 }
 
-export function OpportunitiesContent({ 
-  selectedCategory, 
-  selectedLocation,
-  selectedLevel,
-  selectedField, 
-  searchQuery 
-}: OpportunitiesContentProps) {
+export function OpportunitiesContent({ filters }: OpportunitiesContentProps) {
   const { t } = useLanguage()
   const [opportunities, setOpportunities] = useState<Opportunity[]>([])
   const [loading, setLoading] = useState(true)
@@ -34,11 +25,13 @@ export function OpportunitiesContent({
       
       try {
         const data = await fetchOpportunities({
-          level: selectedLevel,
-          type: selectedCategory,
-          modality: selectedLocation,
-          field: selectedField,
-          search: searchQuery,
+          levels: filters.selectedEducation,
+          types: filters.selectedTypes,
+          modalities: filters.selectedModality,
+          costs: filters.selectedPricing,
+          fields: filters.selectedFields,
+          genderFocus: filters.selectedGenderFocus,
+          search: filters.searchQuery,
         })
         setOpportunities(data)
       } catch (err) {
@@ -50,7 +43,7 @@ export function OpportunitiesContent({
     }
     
     loadOpportunities()
-  }, [selectedCategory, selectedLocation, selectedLevel, selectedField, searchQuery])
+  }, [filters])
 
   if (loading) {
     return (

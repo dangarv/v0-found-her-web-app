@@ -6,23 +6,23 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Search, X } from "lucide-react"
-import { useState } from "react"
 import { useLanguage } from "@/lib/language-context"
 
 // As per query.sql specifications
 const educationLevels = [
-  { id: "high-school", label: "High School", labelEs: "Secundaria" },
+  { id: "high_school", label: "High School", labelEs: "Secundaria" },
   { id: "undergraduate", label: "Undergraduate", labelEs: "Universitario" },
-  { id: "gap-year", label: "Gap Year", labelEs: "Año Sabático" },
 ]
 
 const opportunityTypes = [
   { id: "scholarship", label: "Scholarship", labelEs: "Beca" },
   { id: "research", label: "Research", labelEs: "Investigación" },
-  { id: "summer-program", label: "Summer Program", labelEs: "Programa de Verano" },
+  { id: "summer program", label: "Summer Program", labelEs: "Programa de Verano" },
   { id: "fellowship", label: "Fellowship", labelEs: "Fellowship" },
   { id: "internship", label: "Internship", labelEs: "Pasantía" },
   { id: "grant", label: "Grant", labelEs: "Subvención" },
+  { id: "competition", label: "Competition", labelEs: "Competencia" },
+  { id: "conference", label: "Conference", labelEs: "Conferencia" },
 ]
 
 const modalities = [
@@ -36,71 +36,69 @@ const pricing = [
   { id: "paid", label: "Paid", labelEs: "Pago" },
 ]
 
-const tags = [
+const fields = [
   { id: "stem", label: "STEM", labelEs: "STEM" },
-  { id: "ai", label: "AI", labelEs: "IA" },
-  { id: "research", label: "Research", labelEs: "Investigación" },
-  { id: "entrepreneurship", label: "Entrepreneurship", labelEs: "Emprendimiento" },
-  { id: "climate", label: "Climate", labelEs: "Clima" },
-  { id: "social-impact", label: "Social Impact", labelEs: "Impacto Social" },
+  { id: "technology", label: "Technology", labelEs: "Tecnología" },
+  { id: "science", label: "Science", labelEs: "Ciencia" },
+  { id: "engineering", label: "Engineering", labelEs: "Ingeniería" },
+  { id: "business", label: "Business", labelEs: "Negocios" },
+  { id: "arts", label: "Arts", labelEs: "Artes" },
+  { id: "social sciences", label: "Social Sciences", labelEs: "Ciencias Sociales" },
+  { id: "health", label: "Health", labelEs: "Salud" },
 ]
 
-const womenEligibility = [
-  { id: "women-only", label: "Women Only", labelEs: "Solo Mujeres" },
-  { id: "women-preferred", label: "Women Preferred", labelEs: "Mujeres Preferidas" },
-  { id: "open", label: "Open", labelEs: "Abierto" },
+const genderFocus = [
+  { id: "women-focused", label: "Women Focused", labelEs: "Enfocado en Mujeres" },
+  { id: "open to all", label: "Open to All", labelEs: "Abierto a Todos" },
 ]
+
+export interface OpportunityFilters {
+  searchQuery: string
+  selectedEducation: string[]
+  selectedTypes: string[]
+  selectedModality: string[]
+  selectedPricing: string[]
+  selectedFields: string[]
+  selectedGenderFocus: string[]
+}
 
 interface OpportunitiesFiltersProps {
-  selectedCategory: string
-  setSelectedCategory: (value: string) => void
-  selectedLocation: string
-  setSelectedLocation: (value: string) => void
-  searchQuery: string
-  setSearchQuery: (value: string) => void
+  filters: OpportunityFilters
+  onFiltersChange: (filters: OpportunityFilters) => void
 }
 
 export function OpportunitiesFilters({
-  selectedCategory,
-  setSelectedCategory,
-  selectedLocation,
-  setSelectedLocation,
-  searchQuery,
-  setSearchQuery,
+  filters,
+  onFiltersChange,
 }: OpportunitiesFiltersProps) {
   const { language } = useLanguage()
-  const [selectedEducation, setSelectedEducation] = useState<string[]>([])
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([])
-  const [selectedModality, setSelectedModality] = useState<string[]>([])
-  const [selectedPricing, setSelectedPricing] = useState<string[]>([])
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const [selectedWomenElig, setSelectedWomenElig] = useState<string[]>([])
 
-  const toggle = (id: string, state: string[], setState: (value: string[]) => void) => {
-    setState(state.includes(id) ? state.filter((c) => c !== id) : [...state, id])
+  const toggle = (id: string, currentSelection: string[], field: keyof OpportunityFilters) => {
+    const newSelection = currentSelection.includes(id) 
+      ? currentSelection.filter((c) => c !== id) 
+      : [...currentSelection, id]
+    onFiltersChange({ ...filters, [field]: newSelection })
   }
 
   const clearFilters = () => {
-    setSearchQuery("")
-    setSelectedCategory("all")
-    setSelectedLocation("all")
-    setSelectedEducation([])
-    setSelectedTypes([])
-    setSelectedModality([])
-    setSelectedPricing([])
-    setSelectedTags([])
-    setSelectedWomenElig([])
+    onFiltersChange({
+      searchQuery: "",
+      selectedEducation: [],
+      selectedTypes: [],
+      selectedModality: [],
+      selectedPricing: [],
+      selectedFields: [],
+      selectedGenderFocus: [],
+    })
   }
 
-  const hasFilters = searchQuery || 
-    selectedCategory !== "all" || 
-    selectedLocation !== "all" ||
-    selectedEducation.length > 0 ||
-    selectedTypes.length > 0 ||
-    selectedModality.length > 0 ||
-    selectedPricing.length > 0 ||
-    selectedTags.length > 0 ||
-    selectedWomenElig.length > 0
+  const hasFilters = filters.searchQuery || 
+    filters.selectedEducation.length > 0 ||
+    filters.selectedTypes.length > 0 ||
+    filters.selectedModality.length > 0 ||
+    filters.selectedPricing.length > 0 ||
+    filters.selectedFields.length > 0 ||
+    filters.selectedGenderFocus.length > 0
 
   return (
     <Card className="border-border/50 rounded-2xl">
@@ -121,8 +119,8 @@ export function OpportunitiesFilters({
             <Input
               id="search"
               placeholder={language === "es" ? "Buscar oportunidades..." : "Search opportunities..."}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={filters.searchQuery}
+              onChange={(e) => onFiltersChange({ ...filters, searchQuery: e.target.value })}
               className="pl-9 rounded-xl"
             />
           </div>
@@ -136,8 +134,8 @@ export function OpportunitiesFilters({
               <div key={item.id} className="flex items-center gap-2">
                 <Checkbox
                   id={`edu-${item.id}`}
-                  checked={selectedEducation.includes(item.id)}
-                  onCheckedChange={() => toggle(item.id, selectedEducation, setSelectedEducation)}
+                  checked={filters.selectedEducation.includes(item.id)}
+                  onCheckedChange={() => toggle(item.id, filters.selectedEducation, "selectedEducation")}
                 />
                 <Label htmlFor={`edu-${item.id}`} className="font-normal cursor-pointer">
                   {language === "es" ? item.labelEs : item.label}
@@ -155,8 +153,8 @@ export function OpportunitiesFilters({
               <div key={item.id} className="flex items-center gap-2">
                 <Checkbox
                   id={`type-${item.id}`}
-                  checked={selectedTypes.includes(item.id)}
-                  onCheckedChange={() => toggle(item.id, selectedTypes, setSelectedTypes)}
+                  checked={filters.selectedTypes.includes(item.id)}
+                  onCheckedChange={() => toggle(item.id, filters.selectedTypes, "selectedTypes")}
                 />
                 <Label htmlFor={`type-${item.id}`} className="font-normal cursor-pointer">
                   {language === "es" ? item.labelEs : item.label}
@@ -174,8 +172,8 @@ export function OpportunitiesFilters({
               <div key={item.id} className="flex items-center gap-2">
                 <Checkbox
                   id={`mod-${item.id}`}
-                  checked={selectedModality.includes(item.id)}
-                  onCheckedChange={() => toggle(item.id, selectedModality, setSelectedModality)}
+                  checked={filters.selectedModality.includes(item.id)}
+                  onCheckedChange={() => toggle(item.id, filters.selectedModality, "selectedModality")}
                 />
                 <Label htmlFor={`mod-${item.id}`} className="font-normal cursor-pointer">
                   {language === "es" ? item.labelEs : item.label}
@@ -187,14 +185,14 @@ export function OpportunitiesFilters({
 
         {/* Price */}
         <div className="space-y-3">
-          <Label>{language === "es" ? "Precio" : "Price"}</Label>
+          <Label>{language === "es" ? "Costo" : "Cost"}</Label>
           <div className="space-y-2">
             {pricing.map((item) => (
               <div key={item.id} className="flex items-center gap-2">
                 <Checkbox
                   id={`price-${item.id}`}
-                  checked={selectedPricing.includes(item.id)}
-                  onCheckedChange={() => toggle(item.id, selectedPricing, setSelectedPricing)}
+                  checked={filters.selectedPricing.includes(item.id)}
+                  onCheckedChange={() => toggle(item.id, filters.selectedPricing, "selectedPricing")}
                 />
                 <Label htmlFor={`price-${item.id}`} className="font-normal cursor-pointer">
                   {language === "es" ? item.labelEs : item.label}
@@ -204,18 +202,18 @@ export function OpportunitiesFilters({
           </div>
         </div>
 
-        {/* Tags */}
+        {/* Fields */}
         <div className="space-y-3">
-          <Label>{language === "es" ? "Etiquetas" : "Tags"}</Label>
+          <Label>{language === "es" ? "Campo" : "Field"}</Label>
           <div className="space-y-2">
-            {tags.map((item) => (
+            {fields.map((item) => (
               <div key={item.id} className="flex items-center gap-2">
                 <Checkbox
-                  id={`tag-${item.id}`}
-                  checked={selectedTags.includes(item.id)}
-                  onCheckedChange={() => toggle(item.id, selectedTags, setSelectedTags)}
+                  id={`field-${item.id}`}
+                  checked={filters.selectedFields.includes(item.id)}
+                  onCheckedChange={() => toggle(item.id, filters.selectedFields, "selectedFields")}
                 />
-                <Label htmlFor={`tag-${item.id}`} className="font-normal cursor-pointer">
+                <Label htmlFor={`field-${item.id}`} className="font-normal cursor-pointer">
                   {language === "es" ? item.labelEs : item.label}
                 </Label>
               </div>
@@ -223,18 +221,18 @@ export function OpportunitiesFilters({
           </div>
         </div>
 
-        {/* Women Eligibility */}
+        {/* Gender Focus */}
         <div className="space-y-3">
-          <Label>{language === "es" ? "Elegibilidad para Mujeres" : "Women Eligibility"}</Label>
+          <Label>{language === "es" ? "Enfoque de Género" : "Gender Focus"}</Label>
           <div className="space-y-2">
-            {womenEligibility.map((item) => (
+            {genderFocus.map((item) => (
               <div key={item.id} className="flex items-center gap-2">
                 <Checkbox
-                  id={`women-${item.id}`}
-                  checked={selectedWomenElig.includes(item.id)}
-                  onCheckedChange={() => toggle(item.id, selectedWomenElig, setSelectedWomenElig)}
+                  id={`gender-${item.id}`}
+                  checked={filters.selectedGenderFocus.includes(item.id)}
+                  onCheckedChange={() => toggle(item.id, filters.selectedGenderFocus, "selectedGenderFocus")}
                 />
-                <Label htmlFor={`women-${item.id}`} className="font-normal cursor-pointer">
+                <Label htmlFor={`gender-${item.id}`} className="font-normal cursor-pointer">
                   {language === "es" ? item.labelEs : item.label}
                 </Label>
               </div>
