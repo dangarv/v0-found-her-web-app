@@ -56,7 +56,7 @@ export function MatchCard({ profile, matchScore }: MatchCardProps) {
           <div className="flex flex-col items-center text-center">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-card border-4 border-card shadow-lg">
               <span className="text-2xl font-bold text-primary">
-                {profile.name?.split(" ").map((n) => n[0]).join("") || "?"}
+                {profile.full_name?.split(" ").map((n) => n[0]).join("") || "?"}
               </span>
             </div>
 
