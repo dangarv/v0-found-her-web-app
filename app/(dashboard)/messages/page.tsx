@@ -13,7 +13,7 @@ const mockConversations = [
     id: "1",
     other_participant: {
       id: "user1",
-      full_name: "Sarah Kim",
+      full_name: "Veronica Torres",
       avatar_url: null,
     },
     last_message: {
@@ -26,7 +26,7 @@ const mockConversations = [
     id: "2",
     other_participant: {
       id: "user2",
-      full_name: "Maria Lopez",
+      full_name: "Camila Rodriguez",
       avatar_url: null,
     },
     last_message: {
@@ -39,7 +39,7 @@ const mockConversations = [
     id: "3",
     other_participant: {
       id: "user3",
-      full_name: "Aisha Mbeki",
+      full_name: "Sofia Herrera",
       avatar_url: null,
     },
     last_message: {

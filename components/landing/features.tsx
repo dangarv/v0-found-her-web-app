@@ -10,33 +10,33 @@ export function Features() {
   const features = [
     {
       icon: Search,
-      title: t.opportunitiesFeatureTitle,
-      description: t.opportunitiesFeatureDescription,
+      title: t('opportunitiesFeatureTitle'),
+      description: t('opportunitiesFeatureDescription'),
     },
     {
       icon: Users,
-      title: t.collaborateFeatureTitle,
-      description: t.collaborateFeatureDescription,
+      title: t('collaborateFeatureTitle'),
+      description: t('collaborateFeatureDescription'),
     },
     {
       icon: MessageCircle,
-      title: t.groupsFeatureTitle,
-      description: t.groupsFeatureDescription,
+      title: t('groupsFeatureTitle'),
+      description: t('groupsFeatureDescription'),
     },
     {
       icon: Bookmark,
-      title: t.matchFeatureTitle,
-      description: t.matchFeatureDescription,
+      title: t('matchFeatureTitle'),
+      description: t('matchFeatureDescription'),
     },
     {
       icon: TrendingUp,
-      title: "Career Growth",
-      description: "Access resources and guidance to help you navigate your professional journey.",
+      title: t('careerGrowth'),
+      description: t('careerGrowthDescription'),
     },
     {
       icon: Shield,
-      title: "Safe Space",
-      description: "A verified community built by women, for women, ensuring a supportive environment.",
+      title: t('safeSpace'),
+      description: t('safeSpaceDescription'),
     },
   ]
 
@@ -45,10 +45,10 @@ export function Features() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground text-balance">
-            {t.featuresTitle}
+            {t('featuresTitle')}
           </h2>
           <p className="mt-4 text-lg text-muted-foreground text-pretty">
-            {t.featuresSubtitle}
+            {t('featuresSubtitle')}
           </p>
         </div>
 

@@ -1,6 +1,11 @@
-import { CollaborationPostCard } from "./collaboration-post-card"
+"use client"
 
-// Mock data
+import { CollaborationPostCard } from "./collaboration-post-card"
+import { useLanguage } from "@/lib/language-context"
+import { Badge } from "@/components/ui/badge"
+import { useState } from "react"
+
+// Mock data with Latin American names and locations
 const mockPosts = [
   {
     id: "1",
@@ -8,17 +13,18 @@ const mockPosts = [
     title: "Looking for co-founder for EdTech startup",
     description: "Building an AI-powered platform to help students learn coding. Need someone with business development experience and passion for education.",
     looking_for: ["Business Development", "Marketing", "Product Management"],
-    project_type: "Startup",
+    project_type: "Project",
+    category: "project",
     is_active: true,
     created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     updated_at: new Date().toISOString(),
     profile: {
       id: "user1",
-      email: "sarah@example.com",
-      full_name: "Sarah Kim",
+      email: "veronica@example.com",
+      full_name: "Veronica Torres",
       avatar_url: null,
       bio: "Software engineer passionate about education",
-      location: "San Francisco, CA",
+      location: "Bogota, Colombia",
       skills: ["React", "Node.js", "AI/ML"],
       interests: ["EdTech", "AI"],
       linkedin_url: null,
@@ -34,51 +40,53 @@ const mockPosts = [
   {
     id: "2",
     user_id: "user2",
-    title: "Need designer for hackathon project this weekend",
-    description: "Participating in a climate tech hackathon and looking for a UI/UX designer to help create an impactful solution for carbon footprint tracking.",
-    looking_for: ["UI/UX Design", "Figma", "Mobile Design"],
-    project_type: "Hackathon",
+    title: "Motivation circle for Fulbright applications",
+    description: "Forming a group to support each other through the Fulbright scholarship application process. Weekly check-ins, essay reviews, and interview prep.",
+    looking_for: ["Essay Feedback", "Interview Practice", "Accountability"],
+    project_type: "Motivation Circle",
+    category: "motivation",
     is_active: true,
     created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     updated_at: new Date().toISOString(),
     profile: {
       id: "user2",
-      email: "maria@example.com",
-      full_name: "Maria Lopez",
+      email: "camila@example.com",
+      full_name: "Camila Rodriguez",
       avatar_url: null,
-      bio: "Full-stack developer and climate activist",
-      location: "Austin, TX",
-      skills: ["Python", "Django", "PostgreSQL"],
-      interests: ["Climate Tech", "Sustainability"],
+      bio: "International relations student passionate about diplomacy",
+      location: "Buenos Aires, Argentina",
+      skills: ["Research", "Writing", "Public Speaking"],
+      interests: ["International Relations", "Policy"],
       linkedin_url: null,
       website_url: null,
       is_looking_for_collaborators: true,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     },
-    likes_count: 15,
-    comments_count: 5,
+    likes_count: 45,
+    comments_count: 15,
     is_liked: true,
   },
   {
     id: "3",
     user_id: "user3",
-    title: "Research partner wanted for ML fairness project",
-    description: "Working on a research paper about bias in machine learning models. Looking for someone with strong statistics background and interest in AI ethics.",
-    looking_for: ["Machine Learning", "Statistics", "Research"],
-    project_type: "Research",
+    title: "Skill-Swap: My UX Design for your Python skills",
+    description: "I'm a UX designer looking to learn Python for data visualization. Happy to teach Figma, user research, and design systems in exchange.",
+    looking_for: ["Python", "Data Science", "Visualization"],
+    project_type: "Skill-Swap",
+    category: "skill-swap",
     is_active: true,
     created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     updated_at: new Date().toISOString(),
     profile: {
       id: "user3",
-      email: "aisha@example.com",
-      full_name: "Aisha Mbeki",
+      email: "isabella@example.com",
+      full_name: "Isabella Martinez",
       avatar_url: null,
-      bio: "PhD student in Computer Science",
-      location: "Boston, MA",
-      skills: ["Python", "TensorFlow", "PyTorch"],
-      interests: ["AI Ethics", "Fairness in ML"],
+      bio: "UX Designer at a fintech startup",
+      location: "Mexico City, Mexico",
+      skills: ["Figma", "User Research", "Design Systems"],
+      interests: ["Data Visualization", "Learning to Code"],
       linkedin_url: null,
       website_url: null,
       is_looking_for_collaborators: true,
@@ -92,42 +100,165 @@ const mockPosts = [
   {
     id: "4",
     user_id: "user4",
-    title: "Building a community for women in blockchain",
-    description: "Creating a Discord community and educational content for women interested in blockchain and Web3. Looking for content creators and community managers.",
-    looking_for: ["Content Creation", "Community Management", "Blockchain"],
-    project_type: "Community",
+    title: "Building sustainable fashion marketplace",
+    description: "Creating a platform connecting local artisans with conscious consumers. Looking for developers and marketing experts who care about sustainability.",
+    looking_for: ["Full-Stack Development", "Marketing", "Supply Chain"],
+    project_type: "Project",
+    category: "project",
     is_active: true,
     created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     updated_at: new Date().toISOString(),
     profile: {
       id: "user4",
-      email: "jessica@example.com",
-      full_name: "Jessica Chen",
+      email: "valentina@example.com",
+      full_name: "Valentina Silva",
       avatar_url: null,
-      bio: "Blockchain developer and educator",
-      location: "New York, NY",
-      skills: ["Solidity", "Web3.js", "Technical Writing"],
-      interests: ["Blockchain", "Web3", "Education"],
+      bio: "Fashion entrepreneur and sustainability advocate",
+      location: "Sao Paulo, Brazil",
+      skills: ["Business Strategy", "Sustainability", "E-commerce"],
+      interests: ["Sustainable Fashion", "Social Enterprise"],
       linkedin_url: null,
       website_url: null,
       is_looking_for_collaborators: true,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     },
-    likes_count: 45,
-    comments_count: 18,
+    likes_count: 58,
+    comments_count: 22,
+    is_liked: false,
+  },
+  {
+    id: "5",
+    user_id: "user5",
+    title: "Motivation circle for grad school applications",
+    description: "Looking for 3-4 people applying to computer science masters programs. Let's review SOPs, share resources, and keep each other motivated!",
+    looking_for: ["SOP Review", "Research Experience", "Motivation"],
+    project_type: "Motivation Circle",
+    category: "motivation",
+    is_active: true,
+    created_at: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date().toISOString(),
+    profile: {
+      id: "user5",
+      email: "sofia@example.com",
+      full_name: "Sofia Herrera",
+      avatar_url: null,
+      bio: "CS undergrad aiming for top grad schools",
+      location: "Lima, Peru",
+      skills: ["Machine Learning", "Research", "Python"],
+      interests: ["AI Research", "Graduate Studies"],
+      linkedin_url: null,
+      website_url: null,
+      is_looking_for_collaborators: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    likes_count: 67,
+    comments_count: 28,
+    is_liked: false,
+  },
+  {
+    id: "6",
+    user_id: "user6",
+    title: "Skill-Swap: Marketing for Web Development",
+    description: "I have 5 years of digital marketing experience and want to learn web development. Can teach SEO, content marketing, and growth strategies.",
+    looking_for: ["React", "Next.js", "Web Development"],
+    project_type: "Skill-Swap",
+    category: "skill-swap",
+    is_active: true,
+    created_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date().toISOString(),
+    profile: {
+      id: "user6",
+      email: "lucia@example.com",
+      full_name: "Lucia Fernandez",
+      avatar_url: null,
+      bio: "Digital marketing specialist turned tech enthusiast",
+      location: "Santiago, Chile",
+      skills: ["SEO", "Content Marketing", "Growth Hacking"],
+      interests: ["Web Development", "Tech Startups"],
+      linkedin_url: null,
+      website_url: null,
+      is_looking_for_collaborators: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    likes_count: 41,
+    comments_count: 16,
     is_liked: false,
   },
 ]
 
-export async function CollaborationPosts() {
-  const posts = mockPosts
+interface CollaborationPostsProps {
+  searchQuery: string
+}
+
+const categoryFilters = [
+  { id: "all", label: "All", labelEs: "Todos" },
+  { id: "project", label: "Project", labelEs: "Proyecto", description: "Building a startup or product together" },
+  { id: "motivation", label: "Motivation Circle", labelEs: "Círculo de Motivación", description: "Learning and applying to opportunities together" },
+  { id: "skill-swap", label: "Skill-Swap", labelEs: "Intercambio de Habilidades", description: "1-on-1 reciprocal mentorship" },
+]
+
+export function CollaborationPosts({ searchQuery }: CollaborationPostsProps) {
+  const { t, language } = useLanguage()
+  const [selectedCategory, setSelectedCategory] = useState("all")
+  
+  // Filter posts based on search and category
+  const filteredPosts = mockPosts.filter((post) => {
+    const matchesCategory = selectedCategory === "all" || post.category === selectedCategory
+    
+    if (!searchQuery) return matchesCategory
+    const query = searchQuery.toLowerCase()
+    return matchesCategory && (
+      post.title.toLowerCase().includes(query) ||
+      post.description.toLowerCase().includes(query) ||
+      post.profile.full_name.toLowerCase().includes(query) ||
+      post.looking_for.some(skill => skill.toLowerCase().includes(query))
+    )
+  })
+
+  if (filteredPosts.length === 0) {
+    return (
+      <>
+        <div className="flex flex-wrap gap-2 mb-6">
+          {categoryFilters.map((cat) => (
+            <Badge
+              key={cat.id}
+              variant={selectedCategory === cat.id ? "default" : "outline"}
+              className="cursor-pointer rounded-full px-4 py-2 text-sm transition-colors"
+              onClick={() => setSelectedCategory(cat.id)}
+            >
+              {language === "es" ? cat.labelEs : cat.label}
+            </Badge>
+          ))}
+        </div>
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">{t('noMatchesFound')}</p>
+        </div>
+      </>
+    )
+  }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      {posts.map((post) => (
-        <CollaborationPostCard key={post.id} post={post} />
-      ))}
-    </div>
+    <>
+      <div className="flex flex-wrap gap-2 mb-6">
+        {categoryFilters.map((cat) => (
+          <Badge
+            key={cat.id}
+            variant={selectedCategory === cat.id ? "default" : "outline"}
+            className="cursor-pointer rounded-full px-4 py-2 text-sm transition-colors"
+            onClick={() => setSelectedCategory(cat.id)}
+          >
+            {language === "es" ? cat.labelEs : cat.label}
+          </Badge>
+        ))}
+      </div>
+      <div className="grid gap-6 md:grid-cols-2">
+        {filteredPosts.map((post) => (
+          <CollaborationPostCard key={post.id} post={post} />
+        ))}
+      </div>
+    </>
   )
 }

@@ -1,9 +1,15 @@
+"use client"
+
+import { useLanguage } from "@/lib/language-context"
+
 export function Stats() {
+  const { t } = useLanguage()
+  
   const stats = [
-    { value: "$2M+", label: "Funding Accessed", description: "Through our platform" },
-    { value: "1,200+", label: "Successful Matches", description: "Collaborations formed" },
-    { value: "85%", label: "Success Rate", description: "Application acceptances" },
-    { value: "24/7", label: "Global Access", description: "Available anywhere" },
+    { value: "$2M+", label: t('fundingAccessed'), description: t('fundingDescription') },
+    { value: "1,200+", label: t('successfulMatches'), description: t('matchesDescription') },
+    { value: "85%", label: t('successRate'), description: t('successDescription') },
+    { value: "24/7", label: t('globalAccess'), description: t('globalDescription') },
   ]
 
   return (
@@ -12,10 +18,10 @@ export function Stats() {
         <div className="rounded-3xl bg-primary p-8 md:p-16">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground text-balance">
-              Making a real impact
+              {t('statsTitle')}
             </h2>
             <p className="mt-4 text-lg text-primary-foreground/80 max-w-2xl mx-auto text-pretty">
-              Join thousands of young women who have already transformed their futures through FoundHer.
+              {t('statsSubtitle')}
             </p>
           </div>
 

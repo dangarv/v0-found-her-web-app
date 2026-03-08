@@ -20,20 +20,20 @@ export function CTA() {
 
           <div className="px-8 py-16 md:px-16 md:py-24 text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground text-balance">
-              {t.ctaTitle}
+              {t('ctaTitle')}
             </h2>
             <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
-              {t.ctaSubtitle}
+              {t('ctaSubtitle')}
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button size="lg" asChild className="rounded-xl">
                 <Link href="/auth/sign-up">
-                  {t.joinNow}
+                  {t('joinNow')}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" asChild className="rounded-xl">
-                <Link href="/opportunities">{t.browseOpportunities}</Link>
+                <Link href="/opportunities">{t('browseOpportunities')}</Link>
               </Button>
             </div>
           </div>

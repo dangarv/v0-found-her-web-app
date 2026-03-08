@@ -2,16 +2,24 @@
 
 import { Header } from "@/components/landing/header"
 import { Footer } from "@/components/landing/footer"
-import { OpportunitiesFilters } from "@/components/opportunities/opportunities-filters"
+import { OpportunitiesFilters, type OpportunityFilters } from "@/components/opportunities/opportunities-filters"
 import { OpportunitiesContent } from "@/components/opportunities/opportunities-content"
 import { useLanguage } from "@/lib/language-context"
 import { useState } from "react"
 
+const initialFilters: OpportunityFilters = {
+  searchQuery: "",
+  selectedEducation: [],
+  selectedTypes: [],
+  selectedModality: [],
+  selectedPricing: [],
+  selectedFields: [],
+  selectedGenderFocus: [],
+}
+
 export default function OpportunitiesPage() {
   const { t } = useLanguage()
-  const [selectedCategory, setSelectedCategory] = useState<string>("all")
-  const [selectedLocation, setSelectedLocation] = useState<string>("all")
-  const [searchQuery, setSearchQuery] = useState("")
+  const [filters, setFilters] = useState<OpportunityFilters>(initialFilters)
 
   return (
     <div className="min-h-screen bg-background">
@@ -27,20 +35,12 @@ export default function OpportunitiesPage() {
           <div className="flex flex-col lg:flex-row gap-8">
             <aside className="w-full lg:w-72 shrink-0">
               <OpportunitiesFilters
-                selectedCategory={selectedCategory}
-                setSelectedCategory={setSelectedCategory}
-                selectedLocation={selectedLocation}
-                setSelectedLocation={setSelectedLocation}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
+                filters={filters}
+                onFiltersChange={setFilters}
               />
             </aside>
             <div className="flex-1">
-              <OpportunitiesContent
-                selectedCategory={selectedCategory}
-                selectedLocation={selectedLocation}
-                searchQuery={searchQuery}
-              />
+              <OpportunitiesContent filters={filters} />
             </div>
           </div>
         </div>

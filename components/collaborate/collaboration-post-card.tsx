@@ -21,6 +21,9 @@ const projectTypeColors: Record<string, string> = {
   Research: "bg-chart-3/10 text-chart-3 border-chart-3/20",
   Community: "bg-primary/10 text-primary border-primary/20",
   "Open Source": "bg-chart-4/10 text-chart-4 border-chart-4/20",
+  "Project": "bg-primary/10 text-primary border-primary/20",
+  "Motivation Circle": "bg-secondary/10 text-secondary border-secondary/20",
+  "Skill-Swap": "bg-chart-3/10 text-chart-3 border-chart-3/20",
 }
 
 export function CollaborationPostCard({ post }: CollaborationPostCardProps) {
@@ -143,7 +146,7 @@ export function CollaborationPostCard({ post }: CollaborationPostCardProps) {
                 <Share2 className="h-4 w-4" />
               </Button>
             </div>
-            <Button size="sm" className="rounded-xl" onClick={handleConnect}>{t.connect}</Button>
+            <Button size="lg" className="rounded-xl px-6" onClick={handleConnect}>{t('connect')}</Button>
           </div>
         </CardContent>
       </Card>
