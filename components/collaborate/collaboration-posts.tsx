@@ -1,4 +1,7 @@
+"use client"
+
 import { CollaborationPostCard } from "./collaboration-post-card"
+import { useLanguage } from "@/lib/language-context"
 
 // Mock data
 const mockPosts = [
@@ -120,12 +123,36 @@ const mockPosts = [
   },
 ]
 
-export async function CollaborationPosts() {
-  const posts = mockPosts
+interface CollaborationPostsProps {
+  searchQuery: string
+}
+
+export function CollaborationPosts({ searchQuery }: CollaborationPostsProps) {
+  const { t } = useLanguage()
+  
+  // Filter posts based on search
+  const filteredPosts = mockPosts.filter((post) => {
+    if (!searchQuery) return true
+    const query = searchQuery.toLowerCase()
+    return (
+      post.title.toLowerCase().includes(query) ||
+      post.description.toLowerCase().includes(query) ||
+      post.profile.full_name.toLowerCase().includes(query) ||
+      post.looking_for.some(skill => skill.toLowerCase().includes(query))
+    )
+  })
+
+  if (filteredPosts.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">{t('noMatchesFound')}</p>
+      </div>
+    )
+  }
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      {posts.map((post) => (
+      {filteredPosts.map((post) => (
         <CollaborationPostCard key={post.id} post={post} />
       ))}
     </div>

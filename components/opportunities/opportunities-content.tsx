@@ -1,4 +1,7 @@
+"use client"
+
 import { OpportunityCard } from "./opportunity-card"
+import { useLanguage } from "@/lib/language-context"
 
 // Mock data for now - will be replaced with Supabase queries
 const mockOpportunities = [
@@ -94,20 +97,43 @@ const mockOpportunities = [
   },
 ]
 
-export async function OpportunitiesContent() {
-  // In production, fetch from Supabase
-  const opportunities = mockOpportunities
+interface OpportunitiesContentProps {
+  selectedCategory: string
+  selectedLocation: string
+  searchQuery: string
+}
+
+export function OpportunitiesContent({ 
+  selectedCategory, 
+  selectedLocation, 
+  searchQuery 
+}: OpportunitiesContentProps) {
+  const { t } = useLanguage()
+  
+  // Filter opportunities based on props
+  const filteredOpportunities = mockOpportunities.filter((opp) => {
+    const matchesCategory = selectedCategory === "all" || opp.category === selectedCategory
+    const matchesLocation = selectedLocation === "all" || 
+      (selectedLocation === "remote" && opp.is_remote) ||
+      (opp.location?.toLowerCase().includes(selectedLocation.toLowerCase()))
+    const matchesSearch = !searchQuery || 
+      opp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      opp.organization.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      opp.description.toLowerCase().includes(searchQuery.toLowerCase())
+    
+    return matchesCategory && matchesLocation && matchesSearch
+  })
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Showing {opportunities.length} opportunities
+          {t('showing')} {filteredOpportunities.length} {t('opportunities').toLowerCase()}
         </p>
       </div>
       
       <div className="grid gap-4">
-        {opportunities.map((opportunity) => (
+        {filteredOpportunities.map((opportunity) => (
           <OpportunityCard key={opportunity.id} opportunity={opportunity} />
         ))}
       </div>

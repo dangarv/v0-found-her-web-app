@@ -31,16 +31,16 @@ export function Header() {
 
               <nav className="hidden md:flex items-center gap-6">
                 <Link href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  {t.features}
+                  {t('features')}
                 </Link>
                 <Link href="#testimonials" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  {t.stories}
+                  {t('stories')}
                 </Link>
                 <Link href="/opportunities" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  {t.opportunities}
+                  {t('opportunities')}
                 </Link>
                 <Link href="/collaborate" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  {t.collaborate}
+                  {t('collaborate')}
                 </Link>
               </nav>
 
@@ -68,10 +68,10 @@ export function Header() {
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <Button variant="ghost" size="sm" asChild>
-                  <Link href="/auth/login">{t.login}</Link>
+                  <Link href="/auth/login">{t('login')}</Link>
                 </Button>
                 <Button size="sm" asChild className="rounded-xl">
-                  <Link href="/auth/sign-up">{t.getStarted}</Link>
+                  <Link href="/auth/sign-up">{t('getStarted')}</Link>
                 </Button>
               </div>
 
@@ -115,23 +115,23 @@ export function Header() {
             <div className="md:hidden border-t border-border/50">
               <div className="px-4 py-4 space-y-3">
                 <Link href="#features" className="block text-sm font-medium text-muted-foreground hover:text-foreground">
-                  {t.features}
+                  {t('features')}
                 </Link>
                 <Link href="#testimonials" className="block text-sm font-medium text-muted-foreground hover:text-foreground">
-                  {t.stories}
+                  {t('stories')}
                 </Link>
                 <Link href="/opportunities" className="block text-sm font-medium text-muted-foreground hover:text-foreground">
-                  {t.opportunities}
+                  {t('opportunities')}
                 </Link>
                 <Link href="/collaborate" className="block text-sm font-medium text-muted-foreground hover:text-foreground">
-                  {t.collaborate}
+                  {t('collaborate')}
                 </Link>
                 <div className="pt-4 flex flex-col gap-2">
                   <Button variant="ghost" asChild className="w-full">
-                    <Link href="/auth/login">{t.login}</Link>
+                    <Link href="/auth/login">{t('login')}</Link>
                   </Button>
                   <Button asChild className="w-full rounded-xl">
-                    <Link href="/auth/sign-up">{t.getStarted}</Link>
+                    <Link href="/auth/sign-up">{t('getStarted')}</Link>
                   </Button>
                 </div>
               </div>

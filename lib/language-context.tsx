@@ -34,6 +34,10 @@ interface Translations {
   matchFeatureDescription: string
   groupsFeatureTitle: string
   groupsFeatureDescription: string
+  careerGrowth: string
+  careerGrowthDescription: string
+  safeSpace: string
+  safeSpaceDescription: string
   // CTA
   ctaTitle: string
   ctaSubtitle: string
@@ -70,6 +74,40 @@ interface Translations {
   noGroupsFound: string
   joinGroup: string
   members: string
+  showing: string
+  // Stats
+  statsTitle: string
+  statsSubtitle: string
+  fundingAccessed: string
+  fundingDescription: string
+  successfulMatches: string
+  matchesDescription: string
+  successRate: string
+  successDescription: string
+  globalAccess: string
+  globalDescription: string
+  // Testimonials
+  testimonialsTitle: string
+  testimonialsSubtitle: string
+  // Footer
+  platform: string
+  resources: string
+  company: string
+  legal: string
+  blog: string
+  guides: string
+  successStories: string
+  faq: string
+  about: string
+  careers: string
+  contact: string
+  press: string
+  privacy: string
+  terms: string
+  cookies: string
+  footerDescription: string
+  allRightsReserved: string
+  messages: string
 }
 
 const translations: Record<Language, Translations> = {
@@ -103,6 +141,10 @@ const translations: Record<Language, Translations> = {
     matchFeatureDescription: "Our algorithm connects you with people who have complementary skills and interests.",
     groupsFeatureTitle: "Communities",
     groupsFeatureDescription: "Join groups based on your interests and connect with like-minded women globally.",
+    careerGrowth: "Career Growth",
+    careerGrowthDescription: "Access resources and guidance to help you navigate your professional journey.",
+    safeSpace: "Safe Space",
+    safeSpaceDescription: "A verified community built by women, for women, ensuring a supportive environment.",
     // CTA
     ctaTitle: "Ready to start your journey?",
     ctaSubtitle: "Join thousands of young women already using FoundHer to discover opportunities and build meaningful connections.",
@@ -139,6 +181,40 @@ const translations: Record<Language, Translations> = {
     noGroupsFound: "No groups found. Try adjusting your filters.",
     joinGroup: "Join Group",
     members: "members",
+    showing: "Showing",
+    // Stats
+    statsTitle: "Making a real impact",
+    statsSubtitle: "Join thousands of young women who have already transformed their futures through FoundHer.",
+    fundingAccessed: "Funding Accessed",
+    fundingDescription: "Through our platform",
+    successfulMatches: "Successful Matches",
+    matchesDescription: "Collaborations formed",
+    successRate: "Success Rate",
+    successDescription: "Application acceptances",
+    globalAccess: "Global Access",
+    globalDescription: "Available anywhere",
+    // Testimonials
+    testimonialsTitle: "Stories from our community",
+    testimonialsSubtitle: "Hear from women who have found success through FoundHer.",
+    // Footer
+    platform: "Platform",
+    resources: "Resources",
+    company: "Company",
+    legal: "Legal",
+    blog: "Blog",
+    guides: "Guides",
+    successStories: "Success Stories",
+    faq: "FAQ",
+    about: "About",
+    careers: "Careers",
+    contact: "Contact",
+    press: "Press",
+    privacy: "Privacy",
+    terms: "Terms",
+    cookies: "Cookies",
+    footerDescription: "Empowering young women globally to discover opportunities and build meaningful connections.",
+    allRightsReserved: "All rights reserved.",
+    messages: "Messages",
   },
   es: {
     // Header
@@ -170,6 +246,10 @@ const translations: Record<Language, Translations> = {
     matchFeatureDescription: "Nuestro algoritmo te conecta con personas que tienen habilidades e intereses complementarios.",
     groupsFeatureTitle: "Comunidades",
     groupsFeatureDescription: "Únete a grupos según tus intereses y conecta con mujeres afines a nivel global.",
+    careerGrowth: "Crecimiento Profesional",
+    careerGrowthDescription: "Accede a recursos y orientación para ayudarte a navegar tu trayectoria profesional.",
+    safeSpace: "Espacio Seguro",
+    safeSpaceDescription: "Una comunidad verificada creada por mujeres, para mujeres, garantizando un ambiente de apoyo.",
     // CTA
     ctaTitle: "¿Lista para comenzar tu viaje?",
     ctaSubtitle: "Únete a miles de mujeres jóvenes que ya usan FoundHer para descubrir oportunidades y construir conexiones significativas.",
@@ -206,22 +286,62 @@ const translations: Record<Language, Translations> = {
     noGroupsFound: "No se encontraron grupos. Intenta ajustar los filtros.",
     joinGroup: "Unirse al Grupo",
     members: "miembros",
+    showing: "Mostrando",
+    // Stats
+    statsTitle: "Generando un impacto real",
+    statsSubtitle: "Únete a miles de mujeres jóvenes que ya han transformado su futuro a través de FoundHer.",
+    fundingAccessed: "Financiamiento Accedido",
+    fundingDescription: "A través de nuestra plataforma",
+    successfulMatches: "Coincidencias Exitosas",
+    matchesDescription: "Colaboraciones formadas",
+    successRate: "Tasa de Éxito",
+    successDescription: "Aceptaciones de solicitudes",
+    globalAccess: "Acceso Global",
+    globalDescription: "Disponible en cualquier lugar",
+    // Testimonials
+    testimonialsTitle: "Historias de nuestra comunidad",
+    testimonialsSubtitle: "Escucha a mujeres que han encontrado éxito a través de FoundHer.",
+    // Footer
+    platform: "Plataforma",
+    resources: "Recursos",
+    company: "Empresa",
+    legal: "Legal",
+    blog: "Blog",
+    guides: "Guías",
+    successStories: "Historias de Éxito",
+    faq: "Preguntas Frecuentes",
+    about: "Acerca de",
+    careers: "Carreras",
+    contact: "Contacto",
+    press: "Prensa",
+    privacy: "Privacidad",
+    terms: "Términos",
+    cookies: "Cookies",
+    footerDescription: "Empoderando a mujeres jóvenes globalmente para descubrir oportunidades y construir conexiones significativas.",
+    allRightsReserved: "Todos los derechos reservados.",
+    messages: "Mensajes",
   },
 }
+
+type TranslationKey = keyof Translations
 
 interface LanguageContextType {
   language: Language
   setLanguage: (lang: Language) => void
-  t: Translations
+  t: (key: TranslationKey) => string
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>("en")
+  
+  const t = (key: TranslationKey): string => {
+    return translations[language][key]
+  }
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t: translations[language] }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   )
